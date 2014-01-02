@@ -173,9 +173,9 @@ bool leatherman::convertBinvoxToVector3d(std::string filename, std::vector<Eigen
   voxels.resize(pc.points.size());
   for(size_t i = 0; i < pc.points.size(); ++i)
   {
-    voxels[i](0) = pc.points[i].x; 
-    voxels[i](1) = pc.points[i].y; 
-    voxels[i](2) = pc.points[i].z; 
+    voxels[i](0) = pc.points[i].x;
+    voxels[i](1) = pc.points[i].y;
+    voxels[i](2) = pc.points[i].z;
   }
 
   return true;
@@ -239,14 +239,15 @@ bool leatherman::voxelizeMesh(std::string filename, double resolution, std::vect
   return true;
 }
 
-void leatherman::convertOcTreeToCollisionMap(octomap::OcTree &octree, arm_navigation_msgs::CollisionMap &cmap)
+void leatherman::convertOcTreeToCollisionMap(octomap::OcTree &octree, moveit_msgs::CollisionMap &cmap)
 {
   cmap.header.frame_id = "/map";
   cmap.header.stamp = ros::Time::now();
-  arm_navigation_msgs::OrientedBoundingBox collObjBox;
-  collObjBox.axis.x = collObjBox.axis.y = 0.0;
-  collObjBox.axis.z = 1.0;
-  collObjBox.angle = 0.0;
+  moveit_msgs::OrientedBoundingBox collObjBox;
+  collObjBox.pose.orientation.w = 1.0;
+  collObjBox.pose.orientation.x = 0.0;
+  collObjBox.pose.orientation.y = 0.0;
+  collObjBox.pose.orientation.z = 0.0;
 
   for (octomap::OcTree::iterator it = octree.begin(octree.getTreeDepth()), end = octree.end(); it != end; ++it)
   {
@@ -255,9 +256,9 @@ void leatherman::convertOcTreeToCollisionMap(octomap::OcTree &octree, arm_naviga
       collObjBox.extents.x = it.getSize();
       collObjBox.extents.y = it.getSize();
       collObjBox.extents.z = it.getSize();
-      collObjBox.center.x = it.getX();
-      collObjBox.center.y = it.getY();
-      collObjBox.center.z = it.getZ();
+      collObjBox.pose.position.x = it.getX();
+      collObjBox.pose.position.y = it.getY();
+      collObjBox.pose.position.z = it.getZ();
       cmap.boxes.push_back(collObjBox);
     }
   }
@@ -278,14 +279,14 @@ void leatherman::getOccupiedVoxelsInOcTree(octomap::OcTree* octree, std::vector<
   }
 }
 
-void leatherman::getOccupiedVoxelsInCollisionMap(const arm_navigation_msgs::CollisionMap &map, std::vector<Eigen::Vector3d> &voxels)
+void leatherman::getOccupiedVoxelsInCollisionMap(const moveit_msgs::CollisionMap &map, std::vector<Eigen::Vector3d> &voxels)
 {
   voxels.resize(map.boxes.size());
   for(size_t i = 0; i < map.boxes.size(); ++i)
   {
-    voxels[i](0) = map.boxes[i].center.x;
-    voxels[i](1) = map.boxes[i].center.y;
-    voxels[i](2) = map.boxes[i].center.z;
+    voxels[i](0) = map.boxes[i].pose.position.x;
+    voxels[i](1) = map.boxes[i].pose.position.y;
+    voxels[i](2) = map.boxes[i].pose.position.z;
   }
 }
 
@@ -301,13 +302,13 @@ bool leatherman::getOccupiedVoxelsInBinvoxFile(std::string binvox_filename, std:
   octomap::OcTree* tree = 0;
 
   // Open input file
-  std::ifstream *input = new std::ifstream(binvox_filename.c_str(), std::ios::in | std::ios::binary);    
+  std::ifstream *input = new std::ifstream(binvox_filename.c_str(), std::ios::in | std::ios::binary);
   if(!input->good())
   {
     ROS_ERROR("Failed to open binvox file, '%s'.", binvox_filename.c_str());
     return false;
   }
-  
+
   // read header
   std::string line;
   *input >> line;    // #binvox
@@ -374,7 +375,7 @@ bool leatherman::getOccupiedVoxelsInBinvoxFile(std::string binvox_filename, std:
   input->unsetf(std::ios::skipws);    // need to read every byte now (!)
   *input >> value;    // read the linefeed char
 
-  while((end_index < size) && input->good()) 
+  while((end_index < size) && input->good())
   {
     *input >> value >> count;
 
@@ -386,17 +387,17 @@ bool leatherman::getOccupiedVoxelsInBinvoxFile(std::string binvox_filename, std:
       {
         // Output progress dots
         if(i % (size / 20) == 0) {
-          std::cout << ".";            
+          std::cout << ".";
           std::cout.flush();
         }
-        // voxel index --> voxel coordinates 
+        // voxel index --> voxel coordinates
         int y = i % width;
         int z = (i / width) % height;
         int x = i / (width * height);
 
         // voxel coordinates --> world coordinates
         octomap::point3d endpoint(
-            (float) ((double) x*res + tx + 0.000001), 
+            (float) ((double) x*res + tx + 0.000001),
             (float) ((double) y*res + ty + 0.000001),
             (float) ((double) z*res + tz + 0.000001));
 
@@ -414,7 +415,7 @@ bool leatherman::getOccupiedVoxelsInBinvoxFile(std::string binvox_filename, std:
   std::cout << "Pruning octree" << std::endl << std::endl;
   tree->updateInnerOccupancy();
   tree->prune();
-  ROS_INFO("Successfully created octree from binvox file with %d voxels.", nr_voxels);  
+  ROS_INFO("Successfully created octree from binvox file with %d voxels.", nr_voxels);
 
   Eigen::Vector3d v;
   for (octomap::OcTree::iterator it = tree->begin(tree->getTreeDepth()), end = tree->end(); it != end; ++it)
@@ -442,7 +443,7 @@ bool leatherman::convertBinvoxToBt(std::string binvox_filename, std::string &bt_
 
   // Open input file
   std::string output_filename;
-  std::ifstream *input = new std::ifstream(binvox_filename.c_str(), std::ios::in | std::ios::binary);    
+  std::ifstream *input = new std::ifstream(binvox_filename.c_str(), std::ios::in | std::ios::binary);
   if(!input->good()) {
     std::cerr << "Error: Could not open input file " << binvox_filename << "!" << std::endl;
     exit(1);
@@ -450,7 +451,7 @@ bool leatherman::convertBinvoxToBt(std::string binvox_filename, std::string &bt_
   else {
     std::cout << "Reading binvox file " << binvox_filename << "." << std::endl;
     if(output_filename.empty())
-    { 
+    {
       output_filename = std::string(binvox_filename).append(".bt");
     }
   }
@@ -522,7 +523,7 @@ bool leatherman::convertBinvoxToBt(std::string binvox_filename, std::string &bt_
   input->unsetf(std::ios::skipws);    // need to read every byte now (!)
   *input >> value;    // read the linefeed char
 
-  while((end_index < size) && input->good()) 
+  while((end_index < size) && input->good())
   {
     *input >> value >> count;
 
@@ -532,16 +533,16 @@ bool leatherman::convertBinvoxToBt(std::string binvox_filename, std::string &bt_
       for(int i=index; i < end_index; i++) {
         // Output progress dots
         if(i % (size / 20) == 0) {
-          std::cout << ".";            
+          std::cout << ".";
           std::cout.flush();
         }
-        // voxel index --> voxel coordinates 
+        // voxel index --> voxel coordinates
         int y = i % width;
         int z = (i / width) % height;
         int x = i / (width * height);
 
         // voxel coordinates --> world coordinates
-        octomap::point3d endpoint((float) ((double) x*res + tx + 0.000001), 
+        octomap::point3d endpoint((float) ((double) x*res + tx + 0.000001),
             (float) ((double) y*res + ty + 0.000001),
             (float) ((double) z*res + tz + 0.000001));
 
@@ -556,12 +557,12 @@ bool leatherman::convertBinvoxToBt(std::string binvox_filename, std::string &bt_
 
   input->close();
   std::cout << "    read " << nr_voxels << " voxels, skipped "<<nr_voxels_out << " (out of bounding box)\n\n";
-  
+
   // prune octree
   std::cout << "Pruning octree" << std::endl << std::endl;
   tree->updateInnerOccupancy();
   tree->prune();
-  
+
   tree->writeBinary(output_filename.c_str());
 
   ROS_INFO("Done writing octree to bt file.");

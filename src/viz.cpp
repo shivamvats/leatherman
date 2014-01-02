@@ -20,7 +20,7 @@ visualization_msgs::Marker viz::getCubeMarker(std::vector<double> &cube, std::ve
 
   std::vector<double> dim(3,0);
   dim[0] = cube[3]; dim[1] = cube[4]; dim[2] = cube[5];
-  
+
   geometry_msgs::Pose pose;
   pose.position.x = cube[0];
   pose.position.y= cube[1];
@@ -144,7 +144,7 @@ visualization_msgs::MarkerArray viz::getPoseMarkerArray(const geometry_msgs::Pos
   visualization_msgs::MarkerArray marker_array;
   marker_array.markers.resize(3);
   ros::Time time = ros::Time::now();
-  
+
   marker_array.markers[0].header.stamp = time;
   marker_array.markers[0].header.frame_id = frame_id;
   marker_array.markers[0].ns = ns;
@@ -332,7 +332,7 @@ visualization_msgs::MarkerArray viz::getSpheresMarkerArray(const std::vector<std
     ROS_WARN("Didn't receive as many colors as I did spheres. Not visualizing. (spheres: %d, colors: %d)", int(pose.size()), int(hue.size()));
     return marker_array;
   }
-  
+
   marker.header.stamp = ros::Time::now();
   marker.header.frame_id = frame_id;
   marker.ns = ns;
@@ -362,7 +362,7 @@ visualization_msgs::MarkerArray viz::getSpheresMarkerArray(const std::vector<std
 visualization_msgs::MarkerArray viz::getRemoveMarkerArray(std::string ns, int max_id)
 {
   visualization_msgs::Marker marker;
-  visualization_msgs::MarkerArray marker_array; 
+  visualization_msgs::MarkerArray marker_array;
   marker.header.stamp = ros::Time::now();
   marker.ns = ns;
   marker.action = visualization_msgs::Marker::DELETE;
@@ -375,7 +375,7 @@ visualization_msgs::MarkerArray viz::getRemoveMarkerArray(std::string ns, int ma
 visualization_msgs::Marker viz::getCubesMarker(const std::vector<std::vector<double> > &poses, double size, const std::vector<double> &color, std::string frame_id, std::string ns, int id)
 {
   visualization_msgs::Marker marker;
-  
+
   //check if the list is empty
   if(poses.empty())
   {
@@ -428,20 +428,20 @@ visualization_msgs::MarkerArray viz::getCubesMarkerArray(const std::vector<std::
   {
     ROS_WARN("There are no poses in the %s poses list", ns.c_str());
     return marker_array;
-  } 
-    
+  }
+
   if(color.size()<2)
   {
     ROS_INFO("Not enough colors specified. Expecting two colors {2x4}.");
     return marker_array;
-  } 
-  
+  }
+
   if(color[0].size() < 4 || color[1].size() < 4)
   {
     ROS_INFO("RGBA must be specified for each color.");
     return marker_array;
-  } 
- 
+  }
+
   visualization_msgs::Marker marker;
   marker.header.frame_id = frame_id;
   marker.header.stamp = ros::Time::now();
@@ -458,16 +458,16 @@ visualization_msgs::MarkerArray viz::getCubesMarkerArray(const std::vector<std::
   {
     for(unsigned int j = 0; j < 4; ++j)
       scaled_color[j] = color[0][j] - ((color[0][j] - color[1][j]) * (double(i)/double(poses.size())));
-      
+
     marker_array.markers[i].id = id+i;
     marker_array.markers[i].color.r = scaled_color[0];
     marker_array.markers[i].color.g = scaled_color[1];
     marker_array.markers[i].color.b = scaled_color[2];
-    marker_array.markers[i].color.a = scaled_color[3]; 
+    marker_array.markers[i].color.a = scaled_color[3];
     marker_array.markers[i].pose.position.x = poses[i][0];
     marker_array.markers[i].pose.position.y = poses[i][1];
     marker_array.markers[i].pose.position.z = poses[i][2];
-  } 
+  }
   return marker_array;
 }
 
@@ -501,7 +501,7 @@ visualization_msgs::Marker viz::getTextMarker(geometry_msgs::Pose pose, std::str
   std::vector<double> color(4,1);
   leatherman::HSVtoRGB(&(color[0]), &(color[1]), &(color[2]), hue, 1.0, 1.0);
 
-  return viz::getTextMarker(pose, text, size, color, frame_id, ns, id); 
+  return viz::getTextMarker(pose, text, size, color, frame_id, ns, id);
 }
 
 visualization_msgs::Marker viz::getTextMarker(geometry_msgs::Pose pose, std::string text, double size, std::vector<double> color, std::string frame_id, std::string ns, int id)
@@ -521,7 +521,7 @@ visualization_msgs::Marker viz::getTextMarker(geometry_msgs::Pose pose, std::str
   marker.scale.y = size;
   marker.scale.z = size;
   marker.pose = pose;
-  
+
   marker.color.r = color[0];
   marker.color.g = color[1];
   marker.color.b = color[2];
@@ -622,7 +622,7 @@ visualization_msgs::Marker viz::getMeshMarker(const geometry_msgs::PoseStamped &
 	return marker;
 }
 
-visualization_msgs::MarkerArray viz::getShapesMarkerArray(const std::vector<arm_navigation_msgs::Shape> &shapes, const std::vector<geometry_msgs::Pose> &poses, const std::vector<std::vector<double> >&color, std::string frame_id, std::string ns, int id)
+visualization_msgs::MarkerArray viz::getShapesMarkerArray(const std::vector<shape_msgs::SolidPrimitive> &shapes, const std::vector<geometry_msgs::Pose> &poses, const std::vector<std::vector<double> >&color, std::string frame_id, std::string ns, int id)
 {
   visualization_msgs::Marker m;
   visualization_msgs::MarkerArray ma;
@@ -631,8 +631,8 @@ visualization_msgs::MarkerArray viz::getShapesMarkerArray(const std::vector<arm_
   {
     ROS_WARN("The shapes and poses arrays must be of the same length. (shapes: %d  poses: %d)", int(shapes.size()), int(poses.size()));
     return ma;
-  } 
-    
+  }
+
   m.header.frame_id = frame_id;
   m.header.stamp = ros::Time::now();
   m.ns = ns;
@@ -640,32 +640,32 @@ visualization_msgs::MarkerArray viz::getShapesMarkerArray(const std::vector<arm_
   m.lifetime = ros::Duration(0);
 
   for(std::size_t i = 0; i < shapes.size(); ++i)
-  { 
+  {
     m.id = id+i;
     m.color.r = color[i][0];
     m.color.g = color[i][1];
     m.color.b = color[i][2];
-    m.color.a = color[i][3]; 
+    m.color.a = color[i][3];
     m.pose = poses[i];
-  
-    if(shapes[i].type == arm_navigation_msgs::Shape::BOX)
-    { 
+
+    if(shapes[i].type == shape_msgs::SolidPrimitive::BOX)
+    {
       m.type = visualization_msgs::Marker::CUBE;
       m.scale.x = shapes[i].dimensions[0];
       m.scale.y = shapes[i].dimensions[1];
       m.scale.z = shapes[i].dimensions[2];
       ma.markers.push_back(m);
     }
-    else if(shapes[i].type == arm_navigation_msgs::Shape::SPHERE)
-    { 
+    else if(shapes[i].type == shape_msgs::SolidPrimitive::SPHERE)
+    {
       m.type = visualization_msgs::Marker::SPHERE;
       m.scale.x = shapes[i].dimensions[0];
       m.scale.y = shapes[i].dimensions[0];
       m.scale.z = shapes[i].dimensions[0];
       ma.markers.push_back(m);
     }
-    else if(shapes[i].type == arm_navigation_msgs::Shape::CYLINDER)
-    { 
+    else if(shapes[i].type == shape_msgs::SolidPrimitive::CYLINDER)
+    {
       m.type = visualization_msgs::Marker::CYLINDER;
       m.scale.x = shapes[i].dimensions[0];
       m.scale.y = shapes[i].dimensions[0];
@@ -678,12 +678,12 @@ visualization_msgs::MarkerArray viz::getShapesMarkerArray(const std::vector<arm_
   return ma;
 }
 
-visualization_msgs::MarkerArray viz::getCollisionObjectMarkerArray(const arm_navigation_msgs::CollisionObject &obj, const std::vector<double> &hue, std::string ns, int id)
+visualization_msgs::MarkerArray viz::getCollisionObjectMarkerArray(const moveit_msgs::CollisionObject &obj, const std::vector<double> &hue, std::string ns, int id)
 {
   std::vector<std::vector<double> > color(hue.size(), std::vector<double>(4,1.0));
   for(size_t i = 0; i < color.size(); ++i)
     leatherman::HSVtoRGB(&(color[i][0]), &(color[i][1]), &(color[i][2]), hue[i], 1.0, 1.0);
 
-  return getShapesMarkerArray(obj.shapes, obj.poses, color, obj.header.frame_id, ns, id);  
+  return getShapesMarkerArray(obj.primitives, obj.primitive_poses, color, obj.header.frame_id, ns, id);
 }
 

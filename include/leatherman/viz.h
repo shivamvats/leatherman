@@ -11,7 +11,8 @@
 #include <visualization_msgs/Marker.h>
 #include <boost/lexical_cast.hpp>
 #include <leatherman/utils.h>
-#include <arm_navigation_msgs/CollisionObject.h>
+#include <moveit_msgs/CollisionObject.h>
+#include <shape_msgs/SolidPrimitive.h>
 
 namespace viz
 {
@@ -28,7 +29,7 @@ namespace viz
   visualization_msgs::Marker getSpheresMarker(const std::vector<std::vector<double> > &pose, double radius, int hue, std::string frame_id, std::string ns, int id=0);
 
   visualization_msgs::Marker getSpheresMarker(const std::vector<geometry_msgs::Point> &poses, double radius, int hue, std::string frame_id, std::string ns, int id=0);
-  
+
   visualization_msgs::MarkerArray getSpheresMarkerArray(const std::vector<std::vector<double> > &pose, std::vector<double> &radius, int hue, std::string frame_id, std::string ns, int id=0);
 
   visualization_msgs::MarkerArray getSpheresMarkerArray(const std::vector<std::vector<double> > &pose, const std::vector<int> &hue, std::string frame_id, std::string ns, int id=0);
@@ -58,9 +59,9 @@ namespace viz
   visualization_msgs::Marker getMeshMarker(const geometry_msgs::PoseStamped &pose, const std::vector<geometry_msgs::Point> &vertices, const std::vector<int> &triangles, int hue, bool psychadelic, std::string ns, int id=0);
 
   /* Collision Objects */
-  visualization_msgs::MarkerArray getShapesMarkerArray(const std::vector<arm_navigation_msgs::Shape> &shapes, const std::vector<geometry_msgs::Pose> &poses, const std::vector<std::vector<double> >&color, std::string frame_id, std::string ns, int id);
+  visualization_msgs::MarkerArray getShapesMarkerArray(const std::vector<shape_msgs::SolidPrimitive> &shapes, const std::vector<geometry_msgs::Pose> &poses, const std::vector<std::vector<double> >&color, std::string frame_id, std::string ns, int id);
 
-  visualization_msgs::MarkerArray getCollisionObjectMarkerArray(const arm_navigation_msgs::CollisionObject &obj, const std::vector<double> &hue, std::string ns, int id);
+  visualization_msgs::MarkerArray getCollisionObjectMarkerArray(const moveit_msgs::CollisionObject &obj, const std::vector<double> &hue, std::string ns, int id);
 
   /* Removal */
   visualization_msgs::MarkerArray getRemoveMarkerArray(std::string ns, int max_id);

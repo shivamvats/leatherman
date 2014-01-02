@@ -103,7 +103,7 @@ double leatherman::distanceBetween3DLineSegments(std::vector<int> l1a, std::vect
   return  sqrt(dP[0]*dP[0] + dP[1]*dP[1] + dP[2]*dP[2]);   // return the closest distance
 }
 
-/* Originally from geometric_shapes/shape_operations. Then it 
+/* Originally from geometric_shapes/shape_operations. Then it
  * was moved to pr2_navigation/load_mesh.cpp
  * Written by Ioan Sucan */
 
@@ -126,7 +126,7 @@ shapes::Mesh* leatherman::createMeshFromBinaryStlData(const char *data, unsigned
       // skip the normal
       pos += 12;
 
-      // read vertices 
+      // read vertices
       tf::Vector3 v1(0,0,0);
       tf::Vector3 v2(0,0,0);
       tf::Vector3 v3(0,0,0);
@@ -357,13 +357,13 @@ bool leatherman::getIntermediatePoints(trajectory_msgs::JointTrajectoryPoint a, 
 {
   if(a.positions.size() != b.positions.size())
     return false;
-    
+
   double time_inc = (b.time_from_start - a.time_from_start).toSec() / (num_points+1);
   std::vector<double> inc(a.positions.size(),0);
   for(size_t i = 0; i < a.positions.size(); ++i)
     inc[i] = angles::shortest_angular_distance(a.positions[i], b.positions[i]) / (num_points+1);
-     
-  
+
+
   points.resize(num_points);
   for(int i = 0; i < num_points; ++i)
   {
@@ -372,8 +372,8 @@ bool leatherman::getIntermediatePoints(trajectory_msgs::JointTrajectoryPoint a, 
       points[i].positions[j] = a.positions[j] + (i+1)*inc[j];
     points[i].time_from_start = a.time_from_start + ros::Duration((i+1)*(time_inc));
   }
-  return true; 
-} 
+  return true;
+}
 
 tf::Quaternion leatherman::setRPY(const tfScalar& roll, const tfScalar& pitch, const tfScalar& yaw)
 {
@@ -557,14 +557,14 @@ bool leatherman::getJointPositions(const sensor_msgs::JointState &state, std::ve
     {
       positions[nind] = state.position[i];
       nind++;
-    } 
+    }
     if(nind == names.size())
       break;
   }
   if(nind != names.size())
     return false;
 
-  return true; 
+  return true;
 }
 
 void leatherman::findAndReplaceJointPosition(std::string name, double position, sensor_msgs::JointState &state)
@@ -576,7 +576,7 @@ void leatherman::findAndReplaceJointPosition(std::string name, double position, 
     {
       state.position[i] = position;
       exists = true;
-    }    
+    }
   }
   if(!exists)
   {
@@ -612,12 +612,12 @@ bool leatherman::getSegmentIndex(const KDL::Chain &c, std::string name, int &ind
 }
 
 bool leatherman::getSegmentOfJoint(const KDL::Tree &tree, std::string joint, std::string &segment)
-{ 
+{
   KDL::SegmentMap smap = tree.getSegments();
   for(std::map<std::string, KDL::TreeElement>::const_iterator iter = smap.begin(); iter != smap.end(); ++iter)
-  { 
+  {
     if(iter->second.segment.getJoint().getName().compare(joint) == 0)
-    { 
+    {
       segment = iter->second.segment.getName();
       return true;
     }
@@ -646,9 +646,9 @@ bool leatherman::getChainTip(const KDL::Tree &tree, const std::vector<std::strin
       if(leatherman::getSegmentIndex(chain, segments[j], index))
         num_segments_included++;
     }
-    
+
     if(num_segments_included == segments.size())
-    { 
+    {
       chain_tip = segments[i];
       return true;
     }
@@ -753,7 +753,7 @@ bool leatherman::getMeshComponentsFromResource(std::string resource, std::vector
 
   if(resource.empty())
     return false;
-  
+
   resource_retriever::Retriever retriever;
   resource_retriever::MemoryResource res;
   bool ok = true;
@@ -792,50 +792,53 @@ bool leatherman::getMeshComponentsFromResource(std::string resource, std::vector
 }
 */
 
-bool leatherman::getPose(const arm_navigation_msgs::MultiDOFJointState &state, std::string frame_id, std::string child_frame_id, geometry_msgs::Pose &pose)
+bool leatherman::getPose(const moveit_msgs::MultiDOFJointState &state, std::string frame_id, std::string child_frame_id, geometry_msgs::Pose &pose)
 {
-  if(state.frame_ids.size() != state.child_frame_ids.size())
+    ROS_WARN("leatherman::getPose currently unimplemented");
     return false;
 
-  if(frame_id.compare(child_frame_id) == 0)
-  {
-    pose.position.x = 0; 
-    pose.position.y = 0; 
-    pose.position.z = 0;
-    pose.orientation.w = 1;
-    return true;
-  }
-
-  for(size_t i = 0; i < state.frame_ids.size(); ++i)
-  {
-    if(state.frame_ids[i].compare(frame_id) == 0)
-    {
-      if(state.child_frame_ids[i].compare(child_frame_id) == 0)
-      {
-        pose = state.poses[i];
-        return true;
-      }
-    }
-  }
-
-  // look for inverse
-  for(size_t i = 0; i < state.frame_ids.size(); ++i)
-  {
-    if(state.child_frame_ids[i].compare(frame_id) == 0)
-    {
-      if(state.frame_ids[i].compare(child_frame_id) == 0)
-      {
-        tf::Transform bt;
-        leatherman::poseMsgTobtTransform(state.poses[i], bt);
-        leatherman::btTransformToPoseMsg(bt.inverse(), pose);
-        return true;
-      }
-    }
-  }
-  return false;
+//  if(state.frame_ids.size() != state.child_frame_ids.size())
+//    return false;
+//
+//  if(frame_id.compare(child_frame_id) == 0)
+//  {
+//    pose.position.x = 0;
+//    pose.position.y = 0;
+//    pose.position.z = 0;
+//    pose.orientation.w = 1;
+//    return true;
+//  }
+//
+//  for(size_t i = 0; i < state.frame_ids.size(); ++i)
+//  {
+//    if(state.frame_ids[i].compare(frame_id) == 0)
+//    {
+//      if(state.child_frame_ids[i].compare(child_frame_id) == 0)
+//      {
+//        pose = state.poses[i];
+//        return true;
+//      }
+//    }
+//  }
+//
+//  // look for inverse
+//  for(size_t i = 0; i < state.frame_ids.size(); ++i)
+//  {
+//    if(state.child_frame_ids[i].compare(frame_id) == 0)
+//    {
+//      if(state.frame_ids[i].compare(child_frame_id) == 0)
+//      {
+//        tf::Transform bt;
+//        leatherman::poseMsgTobtTransform(state.poses[i], bt);
+//        leatherman::btTransformToPoseMsg(bt.inverse(), pose);
+//        return true;
+//      }
+//    }
+//  }
+//  return false;
 }
 
-bool leatherman::getFrame(const arm_navigation_msgs::MultiDOFJointState &state, std::string frame_id, std::string child_frame_id, KDL::Frame &frame)
+bool leatherman::getFrame(const moveit_msgs::MultiDOFJointState &state, std::string frame_id, std::string child_frame_id, KDL::Frame &frame)
 {
   geometry_msgs::Pose p;
   if(!getPose(state, frame_id, child_frame_id, p))
@@ -1026,7 +1029,7 @@ bool leatherman::getMeshComponentsFromResource(std::string resource, const geome
 
   if(resource.empty())
     return false;
- 
+
   mesh = shapes::createMeshFromResource(resource, s);
   if (mesh == NULL)
     ROS_ERROR("Failed to load mesh '%s'", resource.c_str());
@@ -1052,10 +1055,10 @@ void leatherman::scaleVertices(const std::vector<Eigen::Vector3d> &vin, double s
     sumy += vin[i].y();
     sumz += vin[i].z();
   }
-  mean(0) = sumx / double(vin.size()); 
+  mean(0) = sumx / double(vin.size());
   mean(1) = sumy / double(vin.size());
   mean(2) = sumz / double(vin.size());
-  
+
   //Eigen::Affine3d scale(Eigen::Translation3d(sx, sy, sz) * Eigen::Affine3d::Identity());
   //Eigen::Vector3d scale(sx, sy, sz);
 
@@ -1096,7 +1099,7 @@ double leatherman::getColladaFileScale(std::string resource)
 {
   static std::map<std::string, float> rescale_cache;
 
-  // Try to read unit to meter conversion ratio from mesh. Only valid in Collada XML formats. 
+  // Try to read unit to meter conversion ratio from mesh. Only valid in Collada XML formats.
   TiXmlDocument xmlDoc;
   float unit_scale(1.0);
   resource_retriever::Retriever retriever;

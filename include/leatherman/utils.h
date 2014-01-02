@@ -24,7 +24,7 @@
 #include <urdf/model.h>
 #include <trajectory_msgs/JointTrajectory.h>
 #include <sensor_msgs/JointState.h>
-#include <arm_navigation_msgs/MultiDOFJointState.h>
+#include <moveit_msgs/MultiDOFJointState.h>
 
 namespace leatherman
 {
@@ -82,8 +82,8 @@ namespace leatherman
   bool findJointPosition(const sensor_msgs::JointState &state, std::string name, double &position);
   bool getJointPositions(const sensor_msgs::JointState &state, std::vector<std::string> &names, std::vector<double> &positions);
   void findAndReplaceJointPosition(std::string name, double position, sensor_msgs::JointState &state);
-  bool getPose(const arm_navigation_msgs::MultiDOFJointState &state, std::string frame_id, std::string child_frame_id, geometry_msgs::Pose &pose);
-  bool getFrame(const arm_navigation_msgs::MultiDOFJointState &state, std::string frame_id, std::string child_frame_id, KDL::Frame &frame);
+  bool getPose(const moveit_msgs::MultiDOFJointState &state, std::string frame_id, std::string child_frame_id, geometry_msgs::Pose &pose);
+  bool getFrame(const moveit_msgs::MultiDOFJointState &state, std::string frame_id, std::string child_frame_id, KDL::Frame &frame);
   bool getJointIndex(const KDL::Chain &c, std::string name, int &index);
   bool getSegmentIndex(const KDL::Chain &c, std::string name, int &index);
   bool getSegmentOfJoint(const KDL::Tree &tree, std::string joint, std::string &segment);

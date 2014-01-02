@@ -1,4 +1,4 @@
-/* 
+/*
  * For reading in Binvox files. (http://www.cs.princeton.edu/~min/binvox/)
  * Binvox is a tool that reads in a mesh file and outputs a voxelized
  * version of it.
@@ -22,7 +22,7 @@
 #include <octomap/octomap_types.h>
 #include <octomap/Pointcloud.h>
 #include <octomap_msgs/Octomap.h>
-#include <arm_navigation_msgs/CollisionMap.h>
+#include <moveit_msgs/CollisionMap.h>
 #include <octomap_msgs/conversions.h>
 #include <geometric_shapes/shape_operations.h>
 
@@ -68,11 +68,11 @@ namespace leatherman
 
   bool voxelizeMesh(std::string filename, double resolution, std::vector<Eigen::Vector3d> &voxels);
 
-  void convertOcTreeToCollisionMap(octomap::OcTree &octree, arm_navigation_msgs::CollisionMap &cmap);
+  void convertOcTreeToCollisionMap(octomap::OcTree &octree, moveit_msgs::CollisionMap &cmap);
 
   void getOccupiedVoxelsInOcTree(octomap::OcTree* octree, std::vector<Eigen::Vector3d> &voxels);
 
-  void getOccupiedVoxelsInCollisionMap(const arm_navigation_msgs::CollisionMap &map, std::vector<Eigen::Vector3d> &voxels);
+  void getOccupiedVoxelsInCollisionMap(const moveit_msgs::CollisionMap &map, std::vector<Eigen::Vector3d> &voxels);
 
   /* Uses code from octomap/binvox2bt.cpp */
   bool getOccupiedVoxelsInBinvoxFile(std::string binvox_filename, std::vector<Eigen::Vector3d> &voxels);
