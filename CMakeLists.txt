@@ -48,7 +48,7 @@ catkin_package(INCLUDE_DIRS include
                    trajectory_msgs
                    urdf 
                    visualization_msgs
-               DEPENDS Boost Bullet Eigen
+               DEPENDS boost bullet eigen
                LIBRARIES ${PROJECT_NAME})
 
 add_library(${PROJECT_NAME}
