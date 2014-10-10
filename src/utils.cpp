@@ -1,4 +1,5 @@
 #include <leatherman/utils.h>
+#include <leatherman/print.h>
 //#include <geometric_shapes/mesh_operations.h>
 #include <resource_retriever/retriever.h>
 #include <tinyxml.h>
@@ -712,7 +713,7 @@ void leatherman::setLoggerLevel(std::string package, std::string name, std::stri
   //std::string logger_name = ROSCONSOLE_DEFAULT_NAME + std::string(".") + name;
   std::string logger_name = package + std::string(".") + name;
 
-  ROS_INFO("Setting %s to %s level", logger_name.c_str(), level.c_str());
+  ROS_INFO_PRETTY("Setting %s to %s level", logger_name.c_str(), level.c_str());
 
   log4cxx::LoggerPtr my_logger = log4cxx::Logger::getLogger(logger_name);
 
@@ -732,7 +733,7 @@ void leatherman::setLoggerLevel(std::string name, std::string level)
   //std::string logger_name = ROSCONSOLE_DEFAULT_NAME + std::string(".") + name;
   std::string logger_name = name;
 
-  ROS_INFO("Setting %s to %s level", logger_name.c_str(), level.c_str());
+  ROS_INFO_PRETTY("Setting %s to %s level", logger_name.c_str(), level.c_str());
 
   log4cxx::LoggerPtr my_logger = log4cxx::Logger::getLogger(logger_name);
 
@@ -912,7 +913,7 @@ bool leatherman::getJointLimits(const urdf::Model *urdf, std::string root_name, 
         max_limits[num_joints-i-1] = M_PI;
         continuous[num_joints-i-i] = true;
       }
-      ROS_INFO("[%s] min: %0.3f  max: %0.3f", joint_names[num_joints-i-1].c_str(), min_limits[num_joints-i-1], max_limits[num_joints-i-1]);
+      ROS_INFO_PRETTY("[%s] min: %0.3f  max: %0.3f", joint_names[num_joints-i-1].c_str(), min_limits[num_joints-i-1], max_limits[num_joints-i-1]);
       i++;
     }
     link = urdf->getLink(link->getParent()->name);
