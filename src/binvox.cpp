@@ -1,5 +1,6 @@
 #include <leatherman/binvox.h>
 #include <leatherman/file.h>
+#include <moveit_msgs/OrientedBoundingBox.h>
 #include <cstring>
 
 leatherman::VoxelGrid& Grid()
@@ -239,7 +240,7 @@ bool leatherman::voxelizeMesh(std::string filename, double resolution, std::vect
   return true;
 }
 
-void leatherman::convertOcTreeToCollisionMap(octomap::OcTree &octree, moveit_msgs::CollisionMap &cmap)
+void leatherman::convertOcTreeToCollisionMap(octomap::OcTree &octree, moveit_msgs::CollisionObject &cmap)
 {
   cmap.header.frame_id = "/map";
   cmap.header.stamp = ros::Time::now();
@@ -253,13 +254,22 @@ void leatherman::convertOcTreeToCollisionMap(octomap::OcTree &octree, moveit_msg
   {
     if (octree.isNodeOccupied(*it))
     {
-      collObjBox.extents.x = it.getSize();
-      collObjBox.extents.y = it.getSize();
-      collObjBox.extents.z = it.getSize();
-      collObjBox.pose.position.x = it.getX();
-      collObjBox.pose.position.y = it.getY();
-      collObjBox.pose.position.z = it.getZ();
-      cmap.boxes.push_back(collObjBox);
+      shape_msgs::SolidPrimitive sp;
+      sp.type = shape_msgs::SolidPrimitive::BOX;
+      sp.dimensions.resize(3);
+      sp.dimensions[0] = it.getSize();
+      sp.dimensions[1] = it.getSize();
+      sp.dimensions[2] = it.getSize();
+
+      geometry_msgs::Pose pose;
+      pose.position.x = it.getX();
+      pose.position.y = it.getY();
+      pose.position.z = it.getZ();
+      pose.orientation.w = 1.0;
+      pose.orientation.x = pose.orientation.y = pose.orientation.z = 0.0;
+
+      cmap.primitives.push_back(sp);
+      cmap.primitive_poses.push_back(pose);
     }
   }
 }
@@ -279,14 +289,18 @@ void leatherman::getOccupiedVoxelsInOcTree(octomap::OcTree* octree, std::vector<
   }
 }
 
-void leatherman::getOccupiedVoxelsInCollisionMap(const moveit_msgs::CollisionMap &map, std::vector<Eigen::Vector3d> &voxels)
+void leatherman::getOccupiedVoxelsInCollisionMap(
+    const moveit_msgs::CollisionObject &map,
+    std::vector<Eigen::Vector3d> &voxels)
 {
-  voxels.resize(map.boxes.size());
-  for(size_t i = 0; i < map.boxes.size(); ++i)
+  // cmap assumed to be a list of boxes
+  voxels.resize(map.primitive_poses.size());
+  for(size_t i = 0; i < map.primitive_poses.size(); ++i)
   {
-    voxels[i](0) = map.boxes[i].pose.position.x;
-    voxels[i](1) = map.boxes[i].pose.position.y;
-    voxels[i](2) = map.boxes[i].pose.position.z;
+    const geometry_msgs::Point& p = map.primitive_poses[i].position;
+    voxels[i](0) = p.x;
+    voxels[i](1) = p.y;
+    voxels[i](2) = p.z;
   }
 }
 

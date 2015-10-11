@@ -3,28 +3,29 @@
 #ifndef _LEATHERMAN_UTILS_
 #define _LEATHERMAN_UTILS_
 
-#include <ros/console.h>
-#include <iostream>
 #include <cstdlib>
-#include <vector>
+#include <iostream>
 #include <string>
+#include <vector>
+
+#include <angles/angles.h>
+#include <Eigen/Core>
+#include <Eigen/Geometry>
 #include <geometric_shapes/mesh_operations.h>
 #include <geometry_msgs/Point.h>
 #include <geometry_msgs/Pose.h>
-#include <tf/LinearMath/Vector3.h>
-#include <tf/LinearMath/Transform.h>
-#include <tf/LinearMath/Scalar.h>
-#include <tf/transform_datatypes.h>
-#include <Eigen/Core>
-#include <Eigen/Geometry>
-#include <angles/angles.h>
-#include <kdl/frames.hpp>
 #include <kdl/chain.hpp>
+#include <kdl/frames.hpp>
 #include <kdl/tree.hpp>
-#include <urdf/model.h>
-#include <trajectory_msgs/JointTrajectory.h>
+#include <ros/console.h>
 #include <sensor_msgs/JointState.h>
-#include <moveit_msgs/MultiDOFJointState.h>
+#include <sensor_msgs/MultiDOFJointState.h>
+#include <tf/LinearMath/Scalar.h>
+#include <tf/LinearMath/Transform.h>
+#include <tf/LinearMath/Vector3.h>
+#include <tf/transform_datatypes.h>
+#include <trajectory_msgs/JointTrajectory.h>
+#include <urdf/model.h>
 
 namespace leatherman
 {
@@ -82,8 +83,8 @@ namespace leatherman
   bool findJointPosition(const sensor_msgs::JointState &state, std::string name, double &position);
   bool getJointPositions(const sensor_msgs::JointState &state, std::vector<std::string> &names, std::vector<double> &positions);
   void findAndReplaceJointPosition(std::string name, double position, sensor_msgs::JointState &state);
-  bool getPose(const moveit_msgs::MultiDOFJointState &state, std::string frame_id, std::string child_frame_id, geometry_msgs::Pose &pose);
-  bool getFrame(const moveit_msgs::MultiDOFJointState &state, std::string frame_id, std::string child_frame_id, KDL::Frame &frame);
+  bool getPose(const sensor_msgs::MultiDOFJointState &state, std::string frame_id, std::string child_frame_id, geometry_msgs::Pose &pose);
+  bool getFrame(const sensor_msgs::MultiDOFJointState &state, std::string frame_id, std::string child_frame_id, KDL::Frame &frame);
   bool getJointIndex(const KDL::Chain &c, std::string name, int &index);
   bool getSegmentIndex(const KDL::Chain &c, std::string name, int &index);
   bool getSegmentOfJoint(const KDL::Tree &tree, std::string joint, std::string &segment);

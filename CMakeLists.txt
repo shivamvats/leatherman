@@ -4,62 +4,75 @@ project(leatherman)
 set(CMAKE_BUILD_TYPE Release)
 
 find_package(Boost REQUIRED)
-include_directories(${Boost_INCLUDE_DIRS})
 
 find_package(Bullet REQUIRED)
+
+find_package(
+    catkin REQUIRED
+    COMPONENTS
+        angles 
+        cmake_modules
+        geometric_shapes 
+        geometry_msgs 
+        moveit_msgs
+        octomap_ros
+        octomap_msgs
+        roscpp 
+        sensor_msgs 
+        shape_msgs
+        tf 
+        trajectory_msgs
+        urdf 
+        visualization_msgs)
+
+find_package(orocos_kdl REQUIRED)
+
+find_package(Eigen REQUIRED) # dependent on finding cmake_modules through catkin
+
+find_package(PkgConfig REQUIRED)
+pkg_check_modules(log4cxx REQUIRED liblog4cxx)
+
+catkin_package(
+    INCLUDE_DIRS include
+    LIBRARIES ${PROJECT_NAME}
+    CATKIN_DEPENDS
+        angles 
+        geometric_shapes 
+        geometry_msgs
+        moveit_msgs 
+        octomap_ros
+        octomap_msgs 
+        sensor_msgs 
+        shape_msgs
+        tf 
+        trajectory_msgs
+        urdf 
+        visualization_msgs
+    DEPENDS Boost BULLET Eigen orocos_kdl)
+
 include_directories(${BULLET_INCLUDE_DIRS})
-
-find_package(Eigen REQUIRED)
-include_directories(${EIGEN_INCLUDE_DIRS})
-add_definitions(${EIGEN_DEFINITIONS})
-
-find_package(catkin REQUIRED
-             COMPONENTS
-                angles 
-                geometric_shapes 
-                geometry_msgs 
-                moveit_msgs
-                octomap_ros
-                octomap_msgs
-                orocos_kdl 
-                roscpp 
-                sensor_msgs 
-                shape_msgs
-                tf 
-                trajectory_msgs
-                urdf 
-                visualization_msgs)
+include_directories(${Boost_INCLUDE_DIRS})
+include_directories(${Eigen_INCLUDE_DIRS})
 include_directories(${catkin_INCLUDE_DIRS})
-
+include_directories(${orocos_kdl_INCLUDE_DIRS})
+include_directories(${log4cxx_INCLUDE_DIRS})
 include_directories(include)
 
-catkin_package(INCLUDE_DIRS include
-               CATKIN_DEPENDS
-                   angles 
-                   geometric_shapes 
-                   geometry_msgs
-                   moveit_msgs 
-                   octomap_ros
-                   octomap_msgs 
-                   orocos_kdl 
-                   sensor_msgs 
-                   shape_msgs
-                   tf 
-                   trajectory_msgs
-                   urdf 
-                   visualization_msgs
-               DEPENDS boost bullet eigen
-               LIBRARIES ${PROJECT_NAME})
-
-add_library(${PROJECT_NAME}
-            src/binvox.cpp
-            src/bresenham.cpp
-            src/file.cpp
-            src/print.cpp
-            src/stl.cpp
-            src/utils.cpp 
-            src/viz.cpp)
-target_link_libraries(${PROJECT_NAME} ${catkin_LIBRARIES} ${BULLET_LIBRARIES})
+add_library(
+    ${PROJECT_NAME}
+    src/binvox.cpp
+    src/bresenham.cpp
+    src/file.cpp
+    src/print.cpp
+    src/stl.cpp
+    src/utils.cpp 
+    src/viz.cpp)
+target_link_libraries(
+    ${PROJECT_NAME} 
+    ${catkin_LIBRARIES} 
+    ${BULLET_LIBRARIES} 
+    ${orocos_kdl_LIBRARIES}
+    ${log4cxx_LIBRARIES})
 
 install(TARGETS ${PROJECT_NAME}
         ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}

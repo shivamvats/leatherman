@@ -4,7 +4,7 @@
 #include <resource_retriever/retriever.h>
 #include <tinyxml.h>
 #include <urdf/model.h>
-
+#include <log4cxx/logger.h>
 
 #define SMALL_NUM  0.00000001     // to avoid division overflow
 
@@ -193,7 +193,10 @@ shapes::Mesh* leatherman::createMeshFromBinaryStl(const char *filename)
 }
 */
 
-void leatherman::getMeshComponents(shapes::Mesh* mesh, std::vector<int> &triangles, std::vector<geometry_msgs::Point> &vertices)
+void leatherman::getMeshComponents(
+    shapes::Mesh* mesh,
+    std::vector<int> &triangles,
+    std::vector<geometry_msgs::Point> &vertices)
 {
   geometry_msgs::Point v;
 
@@ -793,7 +796,7 @@ bool leatherman::getMeshComponentsFromResource(std::string resource, std::vector
 }
 */
 
-bool leatherman::getPose(const moveit_msgs::MultiDOFJointState &state, std::string frame_id, std::string child_frame_id, geometry_msgs::Pose &pose)
+bool leatherman::getPose(const sensor_msgs::MultiDOFJointState &state, std::string frame_id, std::string child_frame_id, geometry_msgs::Pose &pose)
 {
     ROS_WARN("leatherman::getPose currently unimplemented");
     return false;
@@ -839,7 +842,7 @@ bool leatherman::getPose(const moveit_msgs::MultiDOFJointState &state, std::stri
 //  return false;
 }
 
-bool leatherman::getFrame(const moveit_msgs::MultiDOFJointState &state, std::string frame_id, std::string child_frame_id, KDL::Frame &frame)
+bool leatherman::getFrame(const sensor_msgs::MultiDOFJointState &state, std::string frame_id, std::string child_frame_id, KDL::Frame &frame)
 {
   geometry_msgs::Pose p;
   if(!getPose(state, frame_id, child_frame_id, p))
