@@ -590,6 +590,7 @@ bool leatherman::getJointPositions(
     }
 
     positions.resize(joint_names.size());
+    missing.clear();
 
     for (size_t nind = 0; nind < joint_names.size(); ++nind) {
         const std::string& joint_name = joint_names[nind];
@@ -599,7 +600,7 @@ bool leatherman::getJointPositions(
         }
         else {
             size_t jind = std::distance(joint_state.name.begin(), it);
-            positions[nind] = joint_state.position[nind];
+            positions[nind] = joint_state.position[jind];
         }
     }
 
