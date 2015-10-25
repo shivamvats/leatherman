@@ -532,6 +532,13 @@ void leatherman::getIntermediatePoints(KDL::Vector a, KDL::Vector b, double d, s
   points.push_back(b);
 }
 
+bool leatherman::isValidJointState(const sensor_msgs::JointState& state)
+{
+    return (state.position.empty() || state.position.size() == state.name.size()) ||
+            (state.velocity.empty() || state.velocity.size() == state.name.size()) ||
+            (state.effort.empty() || state.effort.size() == state.name.size());
+}
+
 bool leatherman::findJointPosition(const sensor_msgs::JointState &state, std::string name, double &position)
 {
   for(size_t i = 0; i < state.name.size(); i++)
@@ -545,30 +552,63 @@ bool leatherman::findJointPosition(const sensor_msgs::JointState &state, std::st
   return false;
 }
 
-bool leatherman::getJointPositions(const sensor_msgs::JointState &state, std::vector<std::string> &names, std::vector<double> &positions)
+bool leatherman::getJointPositions(
+    const sensor_msgs::JointState& joint_state,
+    const std::vector<std::string>& joint_names,
+    std::vector<double>& positions)
 {
-  size_t nind = 0;
-  positions.resize(names.size());
-  for(size_t i = 0; i < state.position.size(); ++i)
-  {
-    if(state.name.size() < i)
-    {
-      ROS_ERROR("Not enough joint names in JointState message.");
-      return false;
+    if (!isValidJointState(joint_state)) {
+        return false;
     }
 
-    if(names[nind].compare(state.name[i]) == 0)
-    {
-      positions[nind] = state.position[i];
-      nind++;
-    }
-    if(nind == names.size())
-      break;
-  }
-  if(nind != names.size())
-    return false;
+    positions.resize(joint_names.size());
 
-  return true;
+    for (size_t nind = 0; nind < joint_names.size(); ++nind) {
+        const std::string& joint_name = joint_names[nind];
+        auto it = std::find(joint_state.name.begin(), joint_state.name.end(), joint_name);
+        if (it == joint_state.name.end()) {
+            positions.clear();
+            return false;
+        }
+        else {
+            size_t jind = std::distance(joint_state.name.begin(), it);
+            positions[nind] = joint_state.position[nind];
+        }
+    }
+
+    return true;
+}
+
+bool leatherman::getJointPositions(
+    const sensor_msgs::JointState& joint_state,
+    const std::vector<std::string>& joint_names,
+    std::vector<double>& positions,
+    std::vector<std::string>& missing)
+{
+    if (!isValidJointState(joint_state)) {
+        return false;
+    }
+
+    positions.resize(joint_names.size());
+
+    for (size_t nind = 0; nind < joint_names.size(); ++nind) {
+        const std::string& joint_name = joint_names[nind];
+        auto it = std::find(joint_state.name.begin(), joint_state.name.end(), joint_name);
+        if (it == joint_state.name.end()) {
+            missing.push_back(joint_name);
+        }
+        else {
+            size_t jind = std::distance(joint_state.name.begin(), it);
+            positions[nind] = joint_state.position[nind];
+        }
+    }
+
+    if (!missing.empty()) {
+        positions.clear();
+        return false;
+    }
+
+    return true;
 }
 
 void leatherman::findAndReplaceJointPosition(std::string name, double position, sensor_msgs::JointState &state)
