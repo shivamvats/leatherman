@@ -4,6 +4,7 @@
 #include <cstdarg>
 #include <cstdio>
 #include <cstring>
+#include <sstream>
 #include <ros/console.h>
 #include <vector>
 #include <string>
@@ -14,9 +15,9 @@
 #include <kdl/frames.hpp>
 #include <kdl/chain.hpp>
 
-namespace leatherman
-{
-inline std::string pad(const char *fmt, ...)
+namespace leatherman {
+
+inline std::string pad(const char* fmt, ...)
 {
     // parse arguments and pass resultant string to configured logger
     va_list args;
@@ -41,7 +42,8 @@ inline std::string pad(const char *fmt, ...)
     va_end(args);
   return std::string(buffer);
 }
-}
+
+} // namespace leatherman
 
 #define ROS_INFO_PRETTY(fmt, ...)   ROS_INFO("%s", leatherman::pad(fmt, ##__VA_ARGS__).c_str());
 #define ROS_WARN_PRETTY(fmt, ...)   ROS_WARN("%s", leatherman::pad(fmt, ##__VA_ARGS__).c_str());
@@ -52,20 +54,45 @@ inline std::string pad(const char *fmt, ...)
 
 namespace leatherman
 {
-  void printPose(const std::vector<double> &p, std::string text);
-  void printPoseMsg(const geometry_msgs::Pose &p, std::string text);
-  void printPoseStampedMsg(const geometry_msgs::PoseStamped &p, std::string text);
-  void printJointTrajectory(const trajectory_msgs::JointTrajectory &traj, std::string text);
-  void printJointTrajectoryPoints(const std::vector<trajectory_msgs::JointTrajectoryPoint> &points, std::string text);
-  void printCompleteJointTrajectory(const trajectory_msgs::JointTrajectory &traj, std::string name);
 
-  void printAffine3d(const Eigen::Affine3d &a, std::string text);
-  void printKDLFrame(const KDL::Frame &f, std::string text);
-  void printKDLFrames(const std::vector<std::vector<KDL::Frame> > &f, std::string text);
-  void printKDLChain(const KDL::Chain &c, std::string text);
+void printPose(const std::vector<double> &p, std::string text);
+void printPoseMsg(const geometry_msgs::Pose &p, std::string text);
+void printPoseStampedMsg(const geometry_msgs::PoseStamped &p, std::string text);
+void printJointTrajectory(
+    const trajectory_msgs::JointTrajectory &traj,
+    std::string text);
+void printJointTrajectoryPoints(
+    const std::vector<trajectory_msgs::JointTrajectoryPoint> &points,
+    std::string text);
+void printCompleteJointTrajectory(
+    const trajectory_msgs::JointTrajectory &traj,
+    std::string name);
 
-  std::string getString(const std::vector<double> &v, int precision=3);
-  std::string getString(const std::vector<bool> &v, std::string t, std::string f);
+void printAffine3d(const Eigen::Affine3d &a, std::string text);
+void printKDLFrame(const KDL::Frame &f, std::string text);
+void printKDLFrames(
+    const std::vector<std::vector<KDL::Frame>>& f,
+    std::string text);
+void printKDLChain(const KDL::Chain &c, std::string text);
+
+std::string getString(const std::vector<double> &v, int precision=3);
+std::string getString(const std::vector<bool> &v, std::string t, std::string f);
+
+template <typename T>
+std::string vectorToString(const std::vector<T>& v)
+{
+    std::stringstream ss;
+    ss << "[ ";
+    for (size_t i = 0; i < v.size(); ++i) {
+        ss << v[i];
+        if (i != v.size() - 1) {
+            ss << ", ";
+        }
+    }
+    ss << "]";
+    return ss.str();
 }
+
+} // namespace leatherman
 
 #endif
