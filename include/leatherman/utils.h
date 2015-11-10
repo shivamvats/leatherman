@@ -201,8 +201,23 @@ bool getChainTip(
     std::string chain_root, std::string &chain_tip);
 
 /* Joint Limits */
-bool getJointLimits(const urdf::Model *urdf, std::string root_name, std::string tip_name, std::vector<std::string> &joint_names, std::vector<double> &min_limits, std::vector<double> &max_limits, std::vector<bool> &continuous);
-bool getJointLimits(const urdf::Model *urdf, std::string root_name, std::string tip_name, std::string joint_name, double &min_limit, double &max_limit, bool &continuous);
+bool getJointLimits(
+    const urdf::Model* urdf,
+    const std::string& root_name,
+    const std::string& tip_name,
+    std::vector<std::string>& joint_names,
+    std::vector<double>& min_limits,
+    std::vector<double>& max_limits,
+    std::vector<bool>& continuous);
+
+bool getJointLimits(
+    const urdf::Model* urdf,
+    const std::string& root_name,
+    const std::string& tip_name,
+    const std::string& joint_name,
+    double &min_limit,
+    double &max_limit,
+    bool &continuous);
 
 /* Colors */
 void HSVtoRGB(double* r, double* g, double* b, double h, double s, double v);

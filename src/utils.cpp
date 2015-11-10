@@ -757,7 +757,7 @@ void leatherman::setLoggerLevel(std::string package, std::string name, std::stri
   //std::string logger_name = ROSCONSOLE_DEFAULT_NAME + std::string(".") + name;
   std::string logger_name = package + std::string(".") + name;
 
-  ROS_INFO_PRETTY("Setting %s to %s level", logger_name.c_str(), level.c_str());
+  ROS_INFO("Setting %s to %s level", logger_name.c_str(), level.c_str());
 
   log4cxx::LoggerPtr my_logger = log4cxx::Logger::getLogger(logger_name);
 
@@ -777,7 +777,7 @@ void leatherman::setLoggerLevel(std::string name, std::string level)
   //std::string logger_name = ROSCONSOLE_DEFAULT_NAME + std::string(".") + name;
   std::string logger_name = name;
 
-  ROS_INFO_PRETTY("Setting %s to %s level", logger_name.c_str(), level.c_str());
+  ROS_INFO("Setting %s to %s level", logger_name.c_str(), level.c_str());
 
   log4cxx::LoggerPtr my_logger = log4cxx::Logger::getLogger(logger_name);
 
@@ -895,114 +895,114 @@ bool leatherman::getFrame(const sensor_msgs::MultiDOFJointState &state, std::str
   return true;
 }
 
-bool leatherman::getJointLimits(const urdf::Model *urdf, std::string root_name, std::string tip_name, std::vector<std::string> &joint_names, std::vector<double> &min_limits, std::vector<double> &max_limits, std::vector<bool> &continuous)
+bool leatherman::getJointLimits(
+    const urdf::Model* urdf,
+    const std::string& root_name,
+    const std::string& tip_name,
+    std::vector<std::string>& joint_names,
+    std::vector<double>& min_limits,
+    std::vector<double>& max_limits,
+    std::vector<bool>& continuous)
 {
-  unsigned int num_joints = 0;
-  boost::shared_ptr<const urdf::Link> link = urdf->getLink(tip_name);
-  while(link && link->name != root_name)
-  {
-    boost::shared_ptr<const urdf::Joint> joint = urdf->getJoint(link->parent_joint->name);
-    ROS_DEBUG( "adding joint: [%s]", joint->name.c_str() );
-    if(!joint)
-    {
-      ROS_ERROR("Could not find joint: %s",link->parent_joint->name.c_str());
-      return false;
-    }
-    if(joint->type != urdf::Joint::UNKNOWN && joint->type != urdf::Joint::FIXED)
-    {
-      num_joints++;
-    }
-    link = urdf->getLink(link->getParent()->name);
-  }
-  ROS_DEBUG("%d joints found.", num_joints);
-
-  min_limits.resize(num_joints);
-  max_limits.resize(num_joints);
-  joint_names.resize(num_joints);
-  continuous.resize(num_joints, false);
-
-  link = urdf->getLink(tip_name);
-  unsigned int i = 0;
-  while(link && i < num_joints)
-  {
-    boost::shared_ptr<const urdf::Joint> joint = urdf->getJoint(link->parent_joint->name);
-    ROS_DEBUG( "getting bounds for joint: [%s]", joint->name.c_str() );
-    if(!joint)
-    {
-      ROS_ERROR("Could not find joint: %s",link->parent_joint->name.c_str());
-      return false;
-    }
-    if(joint->type != urdf::Joint::UNKNOWN && joint->type != urdf::Joint::FIXED)
-    {
-      if( joint->type != urdf::Joint::CONTINUOUS )
-      {
-        joint_names[num_joints-i-1] = joint->name;
-        continuous[num_joints-i-1] = false;
-
-        if(joint->safety == NULL)
-        {
-          min_limits[num_joints-i-1] = joint->limits->lower;
-          max_limits[num_joints-i-1] = joint->limits->upper;
+    // gather joints tracing backwards from the tip link to the root link;
+    // bail out if the root link is not encountered
+    unsigned int num_joints = 0;
+    boost::shared_ptr<const urdf::Link> link = urdf->getLink(tip_name);
+    while (link && link->name != root_name) {
+        boost::shared_ptr<const urdf::Joint> joint = urdf->getJoint(link->parent_joint->name);
+        ROS_DEBUG("adding joint: [%s]", joint->name.c_str() );
+        if (!joint) {
+            ROS_ERROR("Could not find joint: %s", link->parent_joint->name.c_str());
+            return false;
         }
-        else
-        {
-          min_limits[num_joints-i-1] = joint->safety->soft_lower_limit;
-          max_limits[num_joints-i-1] = joint->safety->soft_upper_limit;
+        if (joint->type != urdf::Joint::UNKNOWN && joint->type != urdf::Joint::FIXED) {
+            num_joints++;
         }
-      }
-      else
-      {
-        joint_names[num_joints-i-1] = joint->name;
-        min_limits[num_joints-i-1] = -M_PI;
-        max_limits[num_joints-i-1] = M_PI;
-        continuous[num_joints-i-i] = true;
-      }
-      ROS_INFO_PRETTY("[%s] min: %0.3f  max: %0.3f", joint_names[num_joints-i-1].c_str(), min_limits[num_joints-i-1], max_limits[num_joints-i-1]);
-      i++;
+        link = urdf->getLink(link->getParent()->name);
     }
-    link = urdf->getLink(link->getParent()->name);
-  }
-  return true;
+    ROS_DEBUG("%d joints found.", num_joints);
+    
+    min_limits.resize(num_joints);
+    max_limits.resize(num_joints);
+    joint_names.resize(num_joints);
+    continuous.resize(num_joints, false);
+    
+    // gather limits for all joints between tip and link
+    link = urdf->getLink(tip_name);
+    unsigned int i = 0;
+    while (link && i < num_joints) {
+        boost::shared_ptr<const urdf::Joint> joint = urdf->getJoint(link->parent_joint->name);
+        ROS_DEBUG("getting bounds for joint: [%s]", joint->name.c_str() );
+        if (!joint) {
+            ROS_ERROR("Could not find joint: %s",link->parent_joint->name.c_str());
+            return false;
+        }
+        if (joint->type != urdf::Joint::UNKNOWN && joint->type != urdf::Joint::FIXED) {
+            if (joint->type != urdf::Joint::CONTINUOUS) {
+                joint_names[num_joints-i-1] = joint->name;
+                continuous[num_joints-i-1] = false;
+        
+                if (joint->safety == NULL) {
+                    min_limits[num_joints-i-1] = joint->limits->lower;
+                    max_limits[num_joints-i-1] = joint->limits->upper;
+                }
+                else {
+                    min_limits[num_joints-i-1] = joint->safety->soft_lower_limit;
+                    max_limits[num_joints-i-1] = joint->safety->soft_upper_limit;
+                }
+            }
+            else {
+                joint_names[num_joints-i-1] = joint->name;
+                min_limits[num_joints-i-1] = -M_PI;
+                max_limits[num_joints-i-1] = M_PI;
+                continuous[num_joints-i-i] = true;
+            }
+            ROS_INFO("[%s] min: %0.3f  max: %0.3f", joint_names[num_joints-i-1].c_str(), min_limits[num_joints-i-1], max_limits[num_joints-i-1]);
+            i++;
+        }
+        link = urdf->getLink(link->getParent()->name);
+    }
+    return true;
 }
 
-bool leatherman::getJointLimits(const urdf::Model *urdf, std::string root_name, std::string tip_name, std::string joint_name, double &min_limit, double &max_limit, bool &continuous)
+bool leatherman::getJointLimits(
+    const urdf::Model* urdf,
+    const std::string& root_name,
+    const std::string& tip_name,
+    const std::string& joint_name,
+    double& min_limit,
+    double& max_limit,
+    bool& continuous)
 {
-  bool found_joint = false;
-  boost::shared_ptr<const urdf::Link> link = urdf->getLink(tip_name);
-  while(link && (link->name != root_name) && !found_joint)
-  {
-    boost::shared_ptr<const urdf::Joint> joint = urdf->getJoint(link->parent_joint->name);
-    if(joint->name.compare(joint_name) == 0)
+    bool found_joint = false;
+    boost::shared_ptr<const urdf::Link> link = urdf->getLink(tip_name);
+    while (link && (link->name != root_name) && !found_joint)
     {
-      if(joint->type != urdf::Joint::UNKNOWN && joint->type != urdf::Joint::FIXED)
-      {
-        if(joint->type != urdf::Joint::CONTINUOUS)
-        {
-          continuous = false;
-
-          if(joint->safety == NULL)
-          {
-            min_limit = joint->limits->lower;
-            max_limit = joint->limits->upper;
-          }
-          else
-          {
-            min_limit = joint->safety->soft_lower_limit;
-            max_limit = joint->safety->soft_upper_limit;
-          }
+        boost::shared_ptr<const urdf::Joint> joint = urdf->getJoint(link->parent_joint->name);
+        if (joint->name.compare(joint_name) == 0) {
+            if (joint->type != urdf::Joint::UNKNOWN && joint->type != urdf::Joint::FIXED) {
+                if (joint->type != urdf::Joint::CONTINUOUS) {
+                    continuous = false; 
+                    if (joint->safety == NULL) {
+                        min_limit = joint->limits->lower;
+                        max_limit = joint->limits->upper;
+                    }
+                    else {
+                        min_limit = joint->safety->soft_lower_limit;
+                        max_limit = joint->safety->soft_upper_limit;
+                    }
+                }
+                else {
+                    min_limit = -M_PI;
+                    max_limit = M_PI;
+                    continuous = true;
+                }
+            }
+            found_joint = true;
         }
-        else
-        {
-          min_limit = -M_PI;
-          max_limit = M_PI;
-          continuous = true;
-        }
-      }
-      found_joint = true;
+        link = urdf->getLink(link->getParent()->name);
     }
-    link = urdf->getLink(link->getParent()->name);
-  }
-  return found_joint;
+    return found_joint;
 }
 
 /* Copied from Bullet Physics library */

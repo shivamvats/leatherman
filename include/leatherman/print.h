@@ -95,4 +95,30 @@ std::string vectorToString(const std::vector<T>& v)
 
 } // namespace leatherman
 
+namespace std { // WARNING: non-standard
+
+template <class T, class Allocator>
+ostream& operator<<(ostream& o, const vector<T, Allocator>& v)
+{
+    o << "[ ";
+    for (size_t i = 0; i < v.size(); ++i) {
+        o << v[i];
+        if (i != v.size() - 1) {
+            o << ", ";
+        }
+    }
+    o << "]";
+    return o;
+}
+
+template <class T, class Allocator>
+string to_string(const std::vector<T, Allocator>& v)
+{
+    stringstream ss;
+    ss << v;
+    return ss.str();
+}
+
+} // namespace std
+
 #endif
