@@ -3,14 +3,21 @@
 #include <leatherman/viz.h>
 #include <tf/LinearMath/Quaternion.h>
 
-visualization_msgs::Marker viz::getCubeMarker(geometry_msgs::PoseStamped pose, std::vector<double> dim, int hue, std::string ns, int id)
+namespace viz {
+
+visualization_msgs::Marker getCubeMarker(
+    geometry_msgs::PoseStamped pose,
+    std::vector<double> dim,
+    int hue,
+    std::string ns,
+    int id)
 {
-  std::vector<double> color(4,1);
-  leatherman::HSVtoRGB(&(color[0]), &(color[1]), &(color[2]), hue, 1.0, 1.0);
-  return getCubeMarker(pose.pose, dim, color, pose.header.frame_id, ns, id);
+    std::vector<double> color(4,1);
+    leatherman::HSVtoRGB(&(color[0]), &(color[1]), &(color[2]), hue, 1.0, 1.0);
+    return getCubeMarker(pose.pose, dim, color, pose.header.frame_id, ns, id);
 }
 
-visualization_msgs::Marker viz::getCubeMarker(std::vector<double> &cube, std::vector<double> &color, std::string frame_id, std::string ns, int id)
+visualization_msgs::Marker getCubeMarker(std::vector<double> &cube, std::vector<double> &color, std::string frame_id, std::string ns, int id)
 {
   if(cube.size() < 6)
   {
@@ -29,7 +36,7 @@ visualization_msgs::Marker viz::getCubeMarker(std::vector<double> &cube, std::ve
   return getCubeMarker(pose, dim, color, frame_id, ns, id);
 }
 
-visualization_msgs::Marker viz::getCubeMarker(geometry_msgs::Pose &pose, std::vector<double> &dim, std::vector<double> &color, std::string frame_id, std::string ns, int id)
+visualization_msgs::Marker getCubeMarker(geometry_msgs::Pose &pose, std::vector<double> &dim, std::vector<double> &color, std::string frame_id, std::string ns, int id)
 {
   visualization_msgs::Marker marker;
 
@@ -68,7 +75,7 @@ visualization_msgs::Marker viz::getCubeMarker(geometry_msgs::Pose &pose, std::ve
   return marker;
 }
 
-visualization_msgs::MarkerArray viz::getPosesMarkerArray(const std::vector<std::vector<double> > &poses, std::string frame_id, std::string ns, int id)
+visualization_msgs::MarkerArray getPosesMarkerArray(const std::vector<std::vector<double> > &poses, std::string frame_id, std::string ns, int id)
 {
   visualization_msgs::MarkerArray marker_array;
   marker_array.markers.resize(poses.size()*3);
@@ -139,7 +146,7 @@ visualization_msgs::MarkerArray viz::getPosesMarkerArray(const std::vector<std::
   return marker_array;
 }
 
-visualization_msgs::MarkerArray viz::getPoseMarkerArray(const geometry_msgs::Pose &pose, std::string frame_id, std::string ns, int id)
+visualization_msgs::MarkerArray getPoseMarkerArray(const geometry_msgs::Pose &pose, std::string frame_id, std::string ns, int id)
 {
   visualization_msgs::MarkerArray marker_array;
   marker_array.markers.resize(3);
@@ -195,12 +202,12 @@ visualization_msgs::MarkerArray viz::getPoseMarkerArray(const geometry_msgs::Pos
   return marker_array;
 }
 
-visualization_msgs::MarkerArray viz::getPoseMarkerArray(const geometry_msgs::PoseStamped &pose, std::string ns, int id)
+visualization_msgs::MarkerArray getPoseMarkerArray(const geometry_msgs::PoseStamped &pose, std::string ns, int id)
 {
-  return viz::getPoseMarkerArray(pose.pose, pose.header.frame_id, ns, id);
+  return getPoseMarkerArray(pose.pose, pose.header.frame_id, ns, id);
 }
 
-visualization_msgs::Marker viz::getSphereMarker(double x, double y, double z, double radius, int hue, std::string frame_id, std::string ns, int id)
+visualization_msgs::Marker getSphereMarker(double x, double y, double z, double radius, int hue, std::string frame_id, std::string ns, int id)
 {
   double r=0,g=0,b=0;
   visualization_msgs::Marker marker;
@@ -226,7 +233,7 @@ visualization_msgs::Marker viz::getSphereMarker(double x, double y, double z, do
   return marker;
 }
 
-visualization_msgs::Marker viz::getSpheresMarker(const std::vector<std::vector<double> > &pose, double radius, int hue, std::string frame_id, std::string ns, int id)
+visualization_msgs::Marker getSpheresMarker(const std::vector<std::vector<double> > &pose, double radius, int hue, std::string frame_id, std::string ns, int id)
 {
   double r=0,g=0,b=0;
   visualization_msgs::Marker marker;
@@ -258,7 +265,7 @@ visualization_msgs::Marker viz::getSpheresMarker(const std::vector<std::vector<d
   return marker;
 }
 
-visualization_msgs::Marker viz::getSpheresMarker(const std::vector<geometry_msgs::Point> &poses, double radius, int hue, std::string frame_id, std::string ns, int id)
+visualization_msgs::Marker getSpheresMarker(const std::vector<geometry_msgs::Point> &poses, double radius, int hue, std::string frame_id, std::string ns, int id)
 {
   double r=0,g=0,b=0;
   visualization_msgs::Marker marker;
@@ -289,7 +296,7 @@ visualization_msgs::Marker viz::getSpheresMarker(const std::vector<geometry_msgs
   return marker;
 }
 
-visualization_msgs::MarkerArray viz::getSpheresMarkerArray(const std::vector<std::vector<double> > &pose, std::vector<double> &radius, int hue, std::string frame_id, std::string ns, int id)
+visualization_msgs::MarkerArray getSpheresMarkerArray(const std::vector<std::vector<double> > &pose, std::vector<double> &radius, int hue, std::string frame_id, std::string ns, int id)
 {
   double r=0,g=0,b=0;
   visualization_msgs::Marker marker;
@@ -321,7 +328,7 @@ visualization_msgs::MarkerArray viz::getSpheresMarkerArray(const std::vector<std
   return marker_array;
 }
 
-visualization_msgs::MarkerArray viz::getSpheresMarkerArray(const std::vector<std::vector<double> > &pose, const std::vector<int> &hue, std::string frame_id, std::string ns, int id)
+visualization_msgs::MarkerArray getSpheresMarkerArray(const std::vector<std::vector<double> > &pose, const std::vector<int> &hue, std::string frame_id, std::string ns, int id)
 {
   double r=0,g=0,b=0;
   visualization_msgs::Marker marker;
@@ -359,7 +366,7 @@ visualization_msgs::MarkerArray viz::getSpheresMarkerArray(const std::vector<std
   return marker_array;
 }
 
-visualization_msgs::MarkerArray viz::getRemoveMarkerArray(std::string ns, int max_id)
+visualization_msgs::MarkerArray getRemoveMarkerArray(std::string ns, int max_id)
 {
   visualization_msgs::Marker marker;
   visualization_msgs::MarkerArray marker_array;
@@ -372,7 +379,7 @@ visualization_msgs::MarkerArray viz::getRemoveMarkerArray(std::string ns, int ma
   return marker_array;
 }
 
-visualization_msgs::Marker viz::getCubesMarker(const std::vector<std::vector<double> > &poses, double size, const std::vector<double> &color, std::string frame_id, std::string ns, int id)
+visualization_msgs::Marker getCubesMarker(const std::vector<std::vector<double> > &poses, double size, const std::vector<double> &color, std::string frame_id, std::string ns, int id)
 {
   visualization_msgs::Marker marker;
 
@@ -418,7 +425,7 @@ visualization_msgs::Marker viz::getCubesMarker(const std::vector<std::vector<dou
   return marker;
 }
 
-visualization_msgs::MarkerArray viz::getCubesMarkerArray(const std::vector<std::vector<double> > &poses, double size, const std::vector<std::vector<double> >&color, std::string frame_id, std::string ns, int id)
+visualization_msgs::MarkerArray getCubesMarkerArray(const std::vector<std::vector<double> > &poses, double size, const std::vector<std::vector<double> >&color, std::string frame_id, std::string ns, int id)
 {
   std::vector<double> scaled_color(4,0);
   visualization_msgs::MarkerArray marker_array;
@@ -471,40 +478,46 @@ visualization_msgs::MarkerArray viz::getCubesMarkerArray(const std::vector<std::
   return marker_array;
 }
 
-visualization_msgs::Marker viz::getLineMarker(const std::vector<geometry_msgs::Point> points, double thickness, int hue, std::string frame_id, std::string ns, int id)
+visualization_msgs::Marker getLineMarker(
+    const std::vector<geometry_msgs::Point>& points,
+    double thickness,
+    int hue,
+    const std::string& frame_id,
+    const std::string& ns,
+    int id)
 {
-  double r=0,g=0,b=0;
-  visualization_msgs::Marker marker;
-  leatherman::HSVtoRGB(&r, &g, &b, hue, 1.0, 1.0);
-
-  marker.header.stamp = ros::Time::now();
-  marker.header.frame_id = frame_id;
-  marker.ns = ns;
-  marker.id = id;
-  marker.type = visualization_msgs::Marker::LINE_STRIP;
-  marker.action = visualization_msgs::Marker::ADD;
-  marker.points = points;
-  marker.scale.x = thickness;
-  marker.pose.position.x = 0.0;
-  marker.pose.position.y = 0.0;
-  marker.pose.position.z = 0.0;
-  marker.color.r = r;
-  marker.color.g = g;
-  marker.color.b = b;
-  marker.color.a = 0.5;
-  marker.lifetime = ros::Duration(0);
-  return marker;
+    double r = 0.0, g = 0.0, b = 0.0;
+    visualization_msgs::Marker marker;
+    leatherman::HSVtoRGB(&r, &g, &b, hue, 1.0, 1.0);
+    
+    marker.header.stamp = ros::Time::now();
+    marker.header.frame_id = frame_id;
+    marker.ns = ns;
+    marker.id = id;
+    marker.type = visualization_msgs::Marker::LINE_STRIP;
+    marker.action = visualization_msgs::Marker::ADD;
+    marker.points = points;
+    marker.scale.x = thickness;
+    marker.pose.position.x = 0.0;
+    marker.pose.position.y = 0.0;
+    marker.pose.position.z = 0.0;
+    marker.color.r = r;
+    marker.color.g = g;
+    marker.color.b = b;
+    marker.color.a = 0.5;
+    marker.lifetime = ros::Duration(0);
+    return marker;
 }
 
-visualization_msgs::Marker viz::getTextMarker(geometry_msgs::Pose pose, std::string text, double size, int hue, std::string frame_id, std::string ns, int id)
+visualization_msgs::Marker getTextMarker(geometry_msgs::Pose pose, std::string text, double size, int hue, std::string frame_id, std::string ns, int id)
 {
   std::vector<double> color(4,1);
   leatherman::HSVtoRGB(&(color[0]), &(color[1]), &(color[2]), hue, 1.0, 1.0);
 
-  return viz::getTextMarker(pose, text, size, color, frame_id, ns, id);
+  return getTextMarker(pose, text, size, color, frame_id, ns, id);
 }
 
-visualization_msgs::Marker viz::getTextMarker(geometry_msgs::Pose pose, std::string text, double size, std::vector<double> color, std::string frame_id, std::string ns, int id)
+visualization_msgs::Marker getTextMarker(geometry_msgs::Pose pose, std::string text, double size, std::vector<double> color, std::string frame_id, std::string ns, int id)
 {
   visualization_msgs::Marker marker;
 
@@ -533,7 +546,7 @@ visualization_msgs::Marker viz::getTextMarker(geometry_msgs::Pose pose, std::str
 
 
 
-visualization_msgs::Marker viz::getMeshMarker(const geometry_msgs::PoseStamped &pose, const std::string &mesh_resource, int hue, std::string ns, int id)
+visualization_msgs::Marker getMeshMarker(const geometry_msgs::PoseStamped &pose, const std::string &mesh_resource, int hue, std::string ns, int id)
 {
 	double r = 0.0, g = 0.0, b = 0.0;
   if(hue > 0)
@@ -568,7 +581,7 @@ visualization_msgs::Marker viz::getMeshMarker(const geometry_msgs::PoseStamped &
   return marker;
 }
 
-visualization_msgs::Marker viz::getMeshMarker(const geometry_msgs::PoseStamped &pose, const std::vector<geometry_msgs::Point> &vertices, const std::vector<int> &triangles, int hue, bool psychadelic, std::string ns, int id)
+visualization_msgs::Marker getMeshMarker(const geometry_msgs::PoseStamped &pose, const std::vector<geometry_msgs::Point> &vertices, const std::vector<int> &triangles, int hue, bool psychadelic, std::string ns, int id)
 {
 	double r = 0.0, g = 0.0, b = 0.0;
 	leatherman::HSVtoRGB(&r, &g, &b, hue, 1.0, 1.0);
@@ -622,7 +635,7 @@ visualization_msgs::Marker viz::getMeshMarker(const geometry_msgs::PoseStamped &
 	return marker;
 }
 
-visualization_msgs::MarkerArray viz::getShapesMarkerArray(const std::vector<shape_msgs::SolidPrimitive> &shapes, const std::vector<geometry_msgs::Pose> &poses, const std::vector<std::vector<double> >&color, std::string frame_id, std::string ns, int id)
+visualization_msgs::MarkerArray getShapesMarkerArray(const std::vector<shape_msgs::SolidPrimitive> &shapes, const std::vector<geometry_msgs::Pose> &poses, const std::vector<std::vector<double> >&color, std::string frame_id, std::string ns, int id)
 {
   visualization_msgs::Marker m;
   visualization_msgs::MarkerArray ma;
@@ -678,7 +691,7 @@ visualization_msgs::MarkerArray viz::getShapesMarkerArray(const std::vector<shap
   return ma;
 }
 
-visualization_msgs::MarkerArray viz::getCollisionObjectMarkerArray(const moveit_msgs::CollisionObject &obj, const std::vector<double> &hue, std::string ns, int id)
+visualization_msgs::MarkerArray getCollisionObjectMarkerArray(const moveit_msgs::CollisionObject &obj, const std::vector<double> &hue, std::string ns, int id)
 {
   std::vector<std::vector<double> > color(hue.size(), std::vector<double>(4,1.0));
   for(size_t i = 0; i < color.size(); ++i)
@@ -687,3 +700,4 @@ visualization_msgs::MarkerArray viz::getCollisionObjectMarkerArray(const moveit_
   return getShapesMarkerArray(obj.primitives, obj.primitive_poses, color, obj.header.frame_id, ns, id);
 }
 
+} // namespace viz
