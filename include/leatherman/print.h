@@ -107,7 +107,7 @@ ostream& operator<<(ostream& o, const vector<T, Allocator>& v)
             o << ", ";
         }
     }
-    o << "]";
+    o << " ]";
     return o;
 }
 
