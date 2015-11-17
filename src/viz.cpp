@@ -425,57 +425,78 @@ visualization_msgs::Marker getCubesMarker(const std::vector<std::vector<double> 
   return marker;
 }
 
-visualization_msgs::MarkerArray getCubesMarkerArray(const std::vector<std::vector<double> > &poses, double size, const std::vector<std::vector<double> >&color, std::string frame_id, std::string ns, int id)
+visualization_msgs::MarkerArray getCubesMarkerArray(
+    const std::vector<std::vector<double>>& poses,
+    double scale,
+    const std::vector<std::vector<double>>& color,
+    const std::string& frame_id,
+    const std::string& ns,
+    int id)
 {
-  std::vector<double> scaled_color(4,0);
-  visualization_msgs::MarkerArray marker_array;
+    //check if the list is empty
+    if (poses.empty()) {
+        ROS_WARN("There are no poses in the %s poses list", ns.c_str());
+        return visualization_msgs::MarkerArray();
+    }
 
-  //check if the list is empty
-  if(poses.empty())
-  {
-    ROS_WARN("There are no poses in the %s poses list", ns.c_str());
-    return marker_array;
-  }
+    if (color.size() < 2) {
+        ROS_INFO("Not enough colors specified. Expecting two colors {2x4}.");
+        return visualization_msgs::MarkerArray();
+    }
 
-  if(color.size()<2)
-  {
-    ROS_INFO("Not enough colors specified. Expecting two colors {2x4}.");
-    return marker_array;
-  }
+    if (color[0].size() < 4 || color[1].size() < 4) {
+        ROS_INFO("RGBA must be specified for each color.");
+        return visualization_msgs::MarkerArray();
+    }
 
-  if(color[0].size() < 4 || color[1].size() < 4)
-  {
-    ROS_INFO("RGBA must be specified for each color.");
-    return marker_array;
-  }
+    visualization_msgs::Marker marker;
 
-  visualization_msgs::Marker marker;
-  marker.header.frame_id = frame_id;
-  marker.header.stamp = ros::Time::now();
-  marker.ns = ns;
-  marker.type = visualization_msgs::Marker::CUBE;
-  marker.action =  visualization_msgs::Marker::ADD;
-  marker.scale.x = size;
-  marker.scale.y = size;
-  marker.scale.z = size;
-  marker.lifetime = ros::Duration(0);
-  marker_array.markers.resize(poses.size(), marker);
+    marker.header.seq = 0;
+    marker.header.stamp = ros::Time::now();
+    marker.header.frame_id = frame_id;
+    marker.ns = ns;
+    marker.id = id;
+    marker.type = visualization_msgs::Marker::CUBE_LIST;
+    marker.action =  visualization_msgs::Marker::ADD;
+    // marker.pose;
+    marker.scale.x = scale;
+    marker.scale.y = scale;
+    marker.scale.z = scale;
+    // marker.color;
+    marker.lifetime = ros::Duration(0);
+    marker.frame_locked = false;
 
-  for(std::size_t i = 0; i < poses.size(); ++i)
-  {
-    for(unsigned int j = 0; j < 4; ++j)
-      scaled_color[j] = color[0][j] - ((color[0][j] - color[1][j]) * (double(i)/double(poses.size())));
+    std::vector<geometry_msgs::Point> points;
+    std::vector<std_msgs::ColorRGBA> colors;
 
-    marker_array.markers[i].id = id+i;
-    marker_array.markers[i].color.r = scaled_color[0];
-    marker_array.markers[i].color.g = scaled_color[1];
-    marker_array.markers[i].color.b = scaled_color[2];
-    marker_array.markers[i].color.a = scaled_color[3];
-    marker_array.markers[i].pose.position.x = poses[i][0];
-    marker_array.markers[i].pose.position.y = poses[i][1];
-    marker_array.markers[i].pose.position.z = poses[i][2];
-  }
-  return marker_array;
+    points.reserve(poses.size());
+    colors.reserve(poses.size());
+
+    for (size_t i = 0; i < poses.size(); ++i) {
+        geometry_msgs::Point p;
+        p.x = poses[i][0];
+        p.y = poses[i][1];
+        p.z = poses[i][2];
+
+        std_msgs::ColorRGBA c;
+
+        // interpolate color
+        const double alpha = ((double)i) / ((double)poses.size());
+        c.r = color[0][0] - (color[0][0] - color[1][0]) * alpha;
+        c.g = color[0][1] - (color[0][1] - color[1][1]) * alpha;
+        c.b = color[0][2] - (color[0][2] - color[1][2]) * alpha;
+        c.a = color[0][3] - (color[0][3] - color[1][3]) * alpha;
+
+        points.push_back(p);
+        colors.push_back(c);
+    }
+
+    marker.points = std::move(points);
+    marker.colors = std::move(colors);
+
+    visualization_msgs::MarkerArray ma;
+    ma.markers.push_back(marker);
+    return ma;
 }
 
 visualization_msgs::Marker getLineMarker(

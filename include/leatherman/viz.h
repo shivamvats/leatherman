@@ -134,11 +134,11 @@ visualization_msgs::Marker getCubesMarker(
     int id = 0);
 
 visualization_msgs::MarkerArray getCubesMarkerArray(
-    const std::vector<std::vector<double> > &poses,
+    const std::vector<std::vector<double>>& poses,
     double size,
-    const std::vector<std::vector<double> >&color,
-    std::string frame_id,
-    std::string ns,
+    const std::vector<std::vector<double>>& color,
+    const std::string& frame_id,
+    const std::string& ns,
     int id = 0);
 
 /* Meshes */
