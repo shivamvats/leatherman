@@ -18,14 +18,14 @@ namespace viz {
 
 /* Poses */
 visualization_msgs::MarkerArray getPoseMarkerArray(
-    const geometry_msgs::Pose &pose,
-    std::string frame_id,
-    std::string text,
+    const geometry_msgs::Pose& pose,
+    const std::string& frame_id,
+    const std::string& ns,
     int id = 0);
 
 visualization_msgs::MarkerArray getPoseMarkerArray(
     const geometry_msgs::PoseStamped &pose,
-    std::string text,
+    const std::string& ns,
     int id = 0);
 
 visualization_msgs::MarkerArray getPosesMarkerArray(
