@@ -112,7 +112,7 @@ ostream& operator<<(ostream& o, const vector<T, Allocator>& v)
 }
 
 template <class T, class Allocator>
-string to_string(const std::vector<T, Allocator>& v)
+string to_string(const vector<T, Allocator>& v)
 {
     stringstream ss;
     ss << v;
