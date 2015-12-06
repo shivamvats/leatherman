@@ -75,143 +75,135 @@ visualization_msgs::Marker getCubeMarker(geometry_msgs::Pose &pose, std::vector<
   return marker;
 }
 
-visualization_msgs::MarkerArray getPosesMarkerArray(const std::vector<std::vector<double> > &poses, std::string frame_id, std::string ns, int id)
+visualization_msgs::MarkerArray getPosesMarkerArray(
+    const std::vector<std::vector<double>>& poses,
+    const std::string& frame_id,
+    const std::string& ns,
+    int id,
+    bool text)
 {
-  visualization_msgs::MarkerArray marker_array;
-  marker_array.markers.resize(poses.size()*3);
-  tf::Quaternion pose_quaternion;
-  geometry_msgs::Quaternion quaternion_msg;
-  ros::Time time = ros::Time::now();
+    std::vector<geometry_msgs::Pose> geo_poses;
+    geo_poses.resize(poses.size());
+    for (size_t i = 0; i < poses.size(); ++i) {
+        geometry_msgs::Pose p;
+        p.position.x = poses[i][0];
+        p.position.y = poses[i][1];
+        p.position.z = poses[i][2];
 
-  for(int i = 0; i < (int)poses.size(); ++i)
-  {
-    pose_quaternion.setRPY(poses[i][3],poses[i][4],poses[i][5]);
-    tf::quaternionTFToMsg(pose_quaternion, quaternion_msg);
+        tf::Quaternion pose_quaternion;
+        pose_quaternion.setRPY(poses[i][3],poses[i][4],poses[i][5]);
+        tf::quaternionTFToMsg(pose_quaternion, p.orientation);
 
-    marker_array.markers[i*3].header.stamp = time;
-    marker_array.markers[i*3].header.frame_id = frame_id;
-    marker_array.markers[i*3].ns = ns;
-    marker_array.markers[i*3].type = visualization_msgs::Marker::ARROW;
-    marker_array.markers[i*3].id = id+(i*3);
-    marker_array.markers[i*3].action = visualization_msgs::Marker::ADD;
-    marker_array.markers[i*3].pose.position.x = poses[i][0];
-    marker_array.markers[i*3].pose.position.y = poses[i][1];
-    marker_array.markers[i*3].pose.position.z = poses[i][2];
-    marker_array.markers[i*3].pose.orientation = quaternion_msg;
-    marker_array.markers[i*3].scale.x = 0.1;
-    marker_array.markers[i*3].scale.y = 0.015;
-    marker_array.markers[i*3].scale.z = 0.015;
-    marker_array.markers[i*3].color.r = 0.0;
-    marker_array.markers[i*3].color.g = 0.7;
-    marker_array.markers[i*3].color.b = 0.6;
-    marker_array.markers[i*3].color.a = 0.7;
-    marker_array.markers[i*3].lifetime = ros::Duration(0);
-    marker_array.markers[i*3+1].header.stamp = time;
-    marker_array.markers[i*3+1].header.frame_id = frame_id;
-    marker_array.markers[i*3+1].ns = ns;
-    marker_array.markers[i*3+1].id = id+(i*3)+1;
-    marker_array.markers[i*3+1].type = visualization_msgs::Marker::SPHERE;
-    marker_array.markers[i*3+1].action = visualization_msgs::Marker::ADD;
-    marker_array.markers[i*3+1].pose.position.x = poses[i][0];
-    marker_array.markers[i*3+1].pose.position.y = poses[i][1];
-    marker_array.markers[i*3+1].pose.position.z = poses[i][2];
-    marker_array.markers[i*3+1].pose.orientation = quaternion_msg;
-    marker_array.markers[i*3+1].scale.x = 0.07;
-    marker_array.markers[i*3+1].scale.y = 0.07;
-    marker_array.markers[i*3+1].scale.z = 0.07;
-    marker_array.markers[i*3+1].color.r = 1.0;
-    marker_array.markers[i*3+1].color.g = 0.0;
-    marker_array.markers[i*3+1].color.b = 0.6;
-    marker_array.markers[i*3+1].color.a = 0.8;
-    marker_array.markers[i*3+1].lifetime = ros::Duration(0);
-    marker_array.markers[i*3+2].header.stamp = time;
-    marker_array.markers[i*3+2].header.frame_id = frame_id;
-    marker_array.markers[i*3+2].ns = ns;
-    marker_array.markers[i*3+2].id = id+(i*3)+2;
-    marker_array.markers[i*3+2].type = visualization_msgs::Marker::TEXT_VIEW_FACING;
-    marker_array.markers[i*3+2].action = visualization_msgs::Marker::ADD;
-    marker_array.markers[i*3+2].pose.position.x = poses[i][0];
-    marker_array.markers[i*3+2].pose.position.y = poses[i][1];
-    marker_array.markers[i*3+2].pose.position.z = poses[i][2];
-    marker_array.markers[i*3+2].scale.x = 0.015;
-    marker_array.markers[i*3+2].scale.y = 0.015;
-    marker_array.markers[i*3+2].scale.z = 0.015;
-    marker_array.markers[i*3+2].color.r = 1.0;
-    marker_array.markers[i*3+2].color.g = 1.0;
-    marker_array.markers[i*3+2].color.b = 1.0;
-    marker_array.markers[i*3+2].color.a = 0.95;
-    marker_array.markers[i*3+2].text = boost::lexical_cast<std::string>(i+1);
-    marker_array.markers[i*3+2].lifetime = ros::Duration(0);
-  }
-  return marker_array;
+        geo_poses[i] = p;
+    }
+
+    return getPosesMarkerArray(geo_poses, frame_id, ns, id, text);
+}
+
+visualization_msgs::MarkerArray getPosesMarkerArray(
+    const std::vector<geometry_msgs::Pose>& poses,
+    const std::string& frame_id,
+    const std::string& ns,
+    int id,
+    bool text)
+{
+    // aggregate markers for each pose
+    visualization_msgs::MarkerArray ma;
+    int cid = id;
+    for (const geometry_msgs::Pose& pose : poses) {
+        visualization_msgs::MarkerArray ma_tmp =
+                getPoseMarkerArray(pose, frame_id, ns, cid);
+        ma.markers.insert(
+                ma.markers.end(), ma_tmp.markers.begin(), ma_tmp.markers.end());
+        cid = id + (int)ma.markers.size();
+    }
+
+    // add numbering to text field if applicable
+    if (text) {
+        int c = 0;
+        for (visualization_msgs::Marker& m : ma.markers) {
+            if (!m.text.empty()) {
+                m.text += std::to_string(c++);
+            }
+        }
+    }
+
+    return ma;
 }
 
 visualization_msgs::MarkerArray getPoseMarkerArray(
     const geometry_msgs::Pose& pose,
     const std::string& frame_id,
     const std::string& ns,
-    int id)
+    int id,
+    bool text)
 {
-    visualization_msgs::MarkerArray marker_array;
-    marker_array.markers.resize(3);
+    visualization_msgs::MarkerArray ma;
+    ma.markers.resize(text ? 3 : 2);
     ros::Time time = ros::Time::now();
 
-    marker_array.markers[0].header.stamp = time;
-    marker_array.markers[0].header.frame_id = frame_id;
-    marker_array.markers[0].ns = ns;
-    marker_array.markers[0].type = visualization_msgs::Marker::ARROW;
-    marker_array.markers[0].id = 0+id;
-    marker_array.markers[0].action = visualization_msgs::Marker::ADD;
-    marker_array.markers[0].pose = pose;
-    marker_array.markers[0].scale.x = 0.1;
-    marker_array.markers[0].scale.y = 0.015;
-    marker_array.markers[0].scale.z = 0.015;
-    marker_array.markers[0].color.r = 0.0;
-    marker_array.markers[0].color.g = 0.7;
-    marker_array.markers[0].color.b = 0.6;
-    marker_array.markers[0].color.a = 0.7;
-    marker_array.markers[0].lifetime = ros::Duration(0);
-    marker_array.markers[1].header.stamp = time;
-    marker_array.markers[1].header.frame_id = frame_id;
-    marker_array.markers[1].ns = ns;
-    marker_array.markers[1].id = 1+id;
-    marker_array.markers[1].type = visualization_msgs::Marker::SPHERE;
-    marker_array.markers[1].action = visualization_msgs::Marker::ADD;
-    marker_array.markers[1].pose = pose;
-    marker_array.markers[1].scale.x = 0.07;
-    marker_array.markers[1].scale.y = 0.07;
-    marker_array.markers[1].scale.z = 0.10;
-    marker_array.markers[1].color.r = 1.0;
-    marker_array.markers[1].color.g = 0.0;
-    marker_array.markers[1].color.b = 0.6;
-    marker_array.markers[1].color.a = 0.6;
-    marker_array.markers[1].lifetime = ros::Duration(0);
-    marker_array.markers[2].header.stamp = time;
-    marker_array.markers[2].header.frame_id = frame_id;
-    marker_array.markers[2].ns = ns;
-    marker_array.markers[2].id = 2+id;
-    marker_array.markers[2].type = visualization_msgs::Marker::TEXT_VIEW_FACING;
-    marker_array.markers[2].action = visualization_msgs::Marker::ADD;
-    marker_array.markers[2].pose = pose;
-    marker_array.markers[2].pose.position.z += 0.05;
-    marker_array.markers[2].scale.x = 0.03;
-    marker_array.markers[2].scale.y = 0.03;
-    marker_array.markers[2].scale.z = 0.03;
-    marker_array.markers[2].color.r = 1.0;
-    marker_array.markers[2].color.g = 1.0;
-    marker_array.markers[2].color.b = 1.0;
-    marker_array.markers[2].color.a = 0.9;
-    marker_array.markers[2].text = ns;
-    marker_array.markers[2].lifetime = ros::Duration(0);
-    return marker_array;
+    ma.markers[0].header.stamp = time;
+    ma.markers[0].header.frame_id = frame_id;
+    ma.markers[0].ns = ns;
+    ma.markers[0].type = visualization_msgs::Marker::ARROW;
+    ma.markers[0].id = 0+id;
+    ma.markers[0].action = visualization_msgs::Marker::ADD;
+    ma.markers[0].pose = pose;
+    ma.markers[0].scale.x = 0.1;
+    ma.markers[0].scale.y = 0.015;
+    ma.markers[0].scale.z = 0.015;
+    ma.markers[0].color.r = 0.0;
+    ma.markers[0].color.g = 0.7;
+    ma.markers[0].color.b = 0.6;
+    ma.markers[0].color.a = 0.7;
+    ma.markers[0].lifetime = ros::Duration(0);
+
+    ma.markers[1].header.stamp = time;
+    ma.markers[1].header.frame_id = frame_id;
+    ma.markers[1].ns = ns;
+    ma.markers[1].id = 1+id;
+    ma.markers[1].type = visualization_msgs::Marker::SPHERE;
+    ma.markers[1].action = visualization_msgs::Marker::ADD;
+    ma.markers[1].pose = pose;
+    ma.markers[1].scale.x = 0.07;
+    ma.markers[1].scale.y = 0.07;
+    ma.markers[1].scale.z = 0.10;
+    ma.markers[1].color.r = 1.0;
+    ma.markers[1].color.g = 0.0;
+    ma.markers[1].color.b = 0.6;
+    ma.markers[1].color.a = 0.6;
+    ma.markers[1].lifetime = ros::Duration(0);
+
+    if (text) {
+        ma.markers[2].header.stamp = time;
+        ma.markers[2].header.frame_id = frame_id;
+        ma.markers[2].ns = ns;
+        ma.markers[2].id = 2+id;
+        ma.markers[2].type = visualization_msgs::Marker::TEXT_VIEW_FACING;
+        ma.markers[2].action = visualization_msgs::Marker::ADD;
+        ma.markers[2].pose = pose;
+        ma.markers[2].pose.position.z += 0.05;
+        ma.markers[2].scale.x = 0.03;
+        ma.markers[2].scale.y = 0.03;
+        ma.markers[2].scale.z = 0.03;
+        ma.markers[2].color.r = 1.0;
+        ma.markers[2].color.g = 1.0;
+        ma.markers[2].color.b = 1.0;
+        ma.markers[2].color.a = 0.9;
+        ma.markers[2].text = ns;
+        ma.markers[2].lifetime = ros::Duration(0);
+    }
+
+    return ma;
 }
 
 visualization_msgs::MarkerArray getPoseMarkerArray(
-    const geometry_msgs::PoseStamped &pose,
+    const geometry_msgs::PoseStamped& pose,
     const std::string& ns,
-    int id)
+    int id,
+    bool text)
 {
-    return getPoseMarkerArray(pose.pose, pose.header.frame_id, ns, id);
+    return getPoseMarkerArray(pose.pose, pose.header.frame_id, ns, id, false);
 }
 
 visualization_msgs::Marker getSphereMarker(double x, double y, double z, double radius, int hue, std::string frame_id, std::string ns, int id)

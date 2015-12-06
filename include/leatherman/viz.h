@@ -21,18 +21,28 @@ visualization_msgs::MarkerArray getPoseMarkerArray(
     const geometry_msgs::Pose& pose,
     const std::string& frame_id,
     const std::string& ns,
-    int id = 0);
+    int id = 0,
+    bool text = false);
 
 visualization_msgs::MarkerArray getPoseMarkerArray(
     const geometry_msgs::PoseStamped &pose,
     const std::string& ns,
-    int id = 0);
+    int id = 0,
+    bool text = false);
 
 visualization_msgs::MarkerArray getPosesMarkerArray(
-    const std::vector<std::vector<double> > &poses,
-    std::string frame_id,
-    std::string ns,
-    int id = 0);
+    const std::vector<std::vector<double>>& poses,
+    const std::string& frame_id,
+    const std::string& ns,
+    int id = 0,
+    bool text = false);
+
+visualization_msgs::MarkerArray getPosesMarkerArray(
+    const std::vector<geometry_msgs::Pose>& poses,
+    const std::string& frame_id,
+    const std::string& ns,
+    int id = 0,
+    bool text = false);
 
 /* Spheres */
 visualization_msgs::Marker getSphereMarker(
