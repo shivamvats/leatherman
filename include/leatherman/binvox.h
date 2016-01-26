@@ -28,12 +28,11 @@
 
 typedef unsigned char byte;
 
-namespace leatherman
-{
+namespace leatherman {
 
-  /* Copied from Wizard Andrew Dornbush */
-  struct VoxelGrid
-  {
+/* Copied from Wizard Andrew Dornbush */
+struct VoxelGrid
+{
     int version;
     int depth, height, width;
     int size;
@@ -41,40 +40,76 @@ namespace leatherman
     float tx, ty, tz;
     float scale;
 
-    VoxelGrid() : version(0), depth(0), height(0), width(0), size(0),
-    voxels(0), tx(0.0f), ty(0.0f), tz(0.0f), scale(0.0f)
-    { }
-  };
+    VoxelGrid() :
+        version(0),
+        depth(0),
+        height(0),
+        width(0),
+        size(0),
+        voxels(0),
+        tx(0.0f),
+        ty(0.0f),
+        tz(0.0f),
+        scale(0.0f)
+    {
+    }
+};
 
-  bool ReadBinvox(std::string filename);
+bool ReadBinvox(const std::string& filename);
 
-  // Doesn't seem to scale the points correctly. Don't use this.
-  bool InsertMesh(std::string filename, const boost::shared_ptr<octomap::Pointcloud>& point_cloud);
+// Doesn't seem to scale the points correctly. Don't use this.
+bool InsertMesh(
+    const std::string& filename,
+    const boost::shared_ptr<octomap::Pointcloud>& point_cloud);
 
-  bool convertBinvoxToOctomapMsg(std::string filename, double resolution, octomap_msgs::Octomap &msg);
+bool convertBinvoxToOctomapMsg(
+    const std::string& filename,
+    double resolution,
+    octomap_msgs::Octomap& msg);
 
-  bool convertBinvoxToPointCloudMsg(std::string filename, sensor_msgs::PointCloud &pc);
+bool convertBinvoxToPointCloudMsg(
+    const std::string& filename,
+    sensor_msgs::PointCloud& pc);
 
-  bool convertBinvoxToVector3d(std::string filename, std::vector<Eigen::Vector3d> &voxels);
+bool convertBinvoxToVector3d(
+    const std::string& filename,
+    std::vector<Eigen::Vector3d>& voxels);
 
-  /* System call to binvox */
-  bool createBinvoxFile(std::string mesh_filename, std::string &binvox_filename);
+/* System call to binvox */
+bool createBinvoxFile(
+    const std::string& mesh_filename,
+    std::string& binvox_filename);
 
-  /* System call to binvox2bt (installed with the octomap package) */
-  bool convertBinvoxToBtSystem(std::string binvox_filename, std::string &bt_filename);
+/* System call to binvox2bt (installed with the octomap package) */
+bool convertBinvoxToBtSystem(
+    const std::string& binvox_filename,
+    std::string& bt_filename);
 
-  /* Copied from octomap/binvox2bt.cpp */
-  bool convertBinvoxToBt(std::string binvox_filename, std::string &bt_filename);
+/* Copied from octomap/binvox2bt.cpp */
+bool convertBinvoxToBt(
+    const std::string& binvox_filename,
+    std::string& bt_filename);
 
-  bool voxelizeMesh(std::string filename, double resolution, std::vector<Eigen::Vector3d> &voxels);
+bool voxelizeMesh(
+    const std::string& filename,
+    double resolution,
+    std::vector<Eigen::Vector3d>& voxels);
 
-  void convertOcTreeToCollisionMap(octomap::OcTree &octree, moveit_msgs::CollisionObject &cmap);
+void convertOcTreeToCollisionMap(
+    const octomap::OcTree& octree,
+    moveit_msgs::CollisionObject& cmap);
 
-  void getOccupiedVoxelsInOcTree(octomap::OcTree* octree, std::vector<Eigen::Vector3d> &voxels);
+void getOccupiedVoxelsInOcTree(
+    octomap::OcTree* octree,
+    std::vector<Eigen::Vector3d>& voxels);
 
-  void getOccupiedVoxelsInCollisionMap(const moveit_msgs::CollisionObject &map, std::vector<Eigen::Vector3d> &voxels);
+void getOccupiedVoxelsInCollisionMap(
+    const moveit_msgs::CollisionObject& map,
+    std::vector<Eigen::Vector3d>& voxels);
 
-  /* Uses code from octomap/binvox2bt.cpp */
-  bool getOccupiedVoxelsInBinvoxFile(std::string binvox_filename, std::vector<Eigen::Vector3d> &voxels);
-}
+/* Uses code from octomap/binvox2bt.cpp */
+bool getOccupiedVoxelsInBinvoxFile(
+    const std::string& binvox_filename,
+    std::vector<Eigen::Vector3d>& voxels);
 
+} // namespace leatherman
