@@ -232,67 +232,58 @@ visualization_msgs::Marker getSphereMarker(double x, double y, double z, double 
   return marker;
 }
 
-visualization_msgs::Marker getSpheresMarker(const std::vector<std::vector<double> > &pose, double radius, int hue, std::string frame_id, std::string ns, int id)
+visualization_msgs::Marker getSpheresMarker(
+    const std::vector<std::vector<double>>& poses,
+    double radius,
+    int hue,
+    const std::string& frame_id,
+    const std::string& ns,
+    int id)
 {
-  double r=0,g=0,b=0;
-  visualization_msgs::Marker marker;
-  leatherman::HSVtoRGB(&r, &g, &b, hue, 1.0, 1.0);
-
-  marker.header.stamp = ros::Time::now();
-  marker.header.frame_id = frame_id;
-  marker.ns = ns;
-  marker.type = visualization_msgs::Marker::SPHERE_LIST;
-  marker.action = visualization_msgs::Marker::ADD;
-  marker.scale.x = radius*2.0;
-  marker.scale.y = radius*2.0;
-  marker.scale.z = radius*2.0;
-  marker.color.r = r;
-  marker.color.g = g;
-  marker.color.b = b;
-  marker.color.a = 0.6;
-  marker.lifetime = ros::Duration(0);
-  marker.id = id;
-
-  marker.points.resize(pose.size());
-  for(size_t i = 0; i < pose.size(); ++i)
-  {
-    marker.points[i].x = pose[i][0];
-    marker.points[i].y = pose[i][1];
-    marker.points[i].z = pose[i][2];
-  }
-
-  return marker;
+    std::vector<geometry_msgs::Point> centers;
+    centers.reserve(poses.size());
+    for (const auto& pose : poses) {
+        if (pose.size() < 3) {
+            continue;
+        }
+        geometry_msgs::Point p;
+        p.x = pose[0];
+        p.y = pose[1];
+        p.z = pose[2];
+        centers.push_back(p);
+    }
+    return getSpheresMarker(centers, radius, hue, frame_id, ns, id);
 }
 
-visualization_msgs::Marker getSpheresMarker(const std::vector<geometry_msgs::Point> &poses, double radius, int hue, std::string frame_id, std::string ns, int id)
+visualization_msgs::Marker getSpheresMarker(
+    const std::vector<geometry_msgs::Point>& poses,
+    double radius,
+    int hue,
+    const std::string& frame_id,
+    const std::string& ns,
+    int id)
 {
-  double r=0,g=0,b=0;
-  visualization_msgs::Marker marker;
-  leatherman::HSVtoRGB(&r, &g, &b, hue, 1.0, 1.0);
+    double r = 0, g = 0, b = 0;
+    visualization_msgs::Marker marker;
+    leatherman::HSVtoRGB(&r, &g, &b, hue, 1.0, 1.0);
 
-  if(poses.empty())
-  {
-    ROS_ERROR("The list of spheres is empty. Nothing to visualize.");
+    marker.header.frame_id = frame_id;
+    marker.header.stamp = ros::Time();
+    marker.header.seq = 0;
+    marker.ns = ns;
+    marker.id = id;
+    marker.type = visualization_msgs::Marker::SPHERE_LIST;
+    marker.action = 0;
+    marker.scale.x = radius;
+    marker.scale.y = radius;
+    marker.scale.z = radius;
+    marker.color.r = r;
+    marker.color.g = g;
+    marker.color.b = b;
+    marker.color.a = 0.8;
+    marker.lifetime = ros::Duration(0);
+    marker.points = poses;
     return marker;
-  }
-
-  marker.header.frame_id = frame_id;
-  marker.header.stamp = ros::Time();
-  marker.header.seq = 0;
-  marker.ns = ns;
-  marker.id = id;
-  marker.type = visualization_msgs::Marker::SPHERE_LIST;
-  marker.action = 0;
-  marker.scale.x = radius;
-  marker.scale.y = radius;
-  marker.scale.z = radius;
-  marker.color.r = r;
-  marker.color.g = g;
-  marker.color.b = b;
-  marker.color.a = 0.8;
-  marker.lifetime = ros::Duration(0);
-  marker.points = poses;
-  return marker;
 }
 
 visualization_msgs::MarkerArray getSpheresMarkerArray(

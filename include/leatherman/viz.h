@@ -54,19 +54,19 @@ visualization_msgs::Marker getSphereMarker(
     int id = 0);
 
 visualization_msgs::Marker getSpheresMarker(
-    const std::vector<std::vector<double> > &pose,
+    const std::vector<std::vector<double>>& poses,
     double radius,
     int hue,
-    std::string frame_id,
-    std::string ns,
+    const std::string& frame_id,
+    const std::string& ns,
     int id = 0);
 
 visualization_msgs::Marker getSpheresMarker(
-    const std::vector<geometry_msgs::Point> &poses,
+    const std::vector<geometry_msgs::Point>& poses,
     double radius,
     int hue,
-    std::string frame_id,
-    std::string ns,
+    const std::string& frame_id,
+    const std::string& ns,
     int id = 0);
 
 visualization_msgs::MarkerArray getSpheresMarkerArray(
