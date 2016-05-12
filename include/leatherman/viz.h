@@ -1,7 +1,7 @@
 /* \author Benjamin Cohen */
 
-#ifndef _VIZ_
-#define _VIZ_
+#ifndef viz_viz_h
+#define viz_viz_h
 
 #include <string>
 #include <ros/console.h>
@@ -16,7 +16,80 @@
 
 namespace viz {
 
-/* Poses */
+/// \brief Return a visualization marker representing a cube.
+///
+/// \param dim The dimensions of the cube with format { length, width, height }
+/// \return The resulting visualization marker or a default-constructed
+///     visualization marker if any parameter is incorrectly formatted.
+visualization_msgs::Marker getCubeMarker(
+    const geometry_msgs::PoseStamped& pose,
+    const std::vector<double>& dim,
+    int hue,
+    const std::string& ns,
+    int id = 0);
+
+/// \brief Return a visualization marker representing a cube.
+///
+/// \param cube The cube with format { x, y, z, length, width, height }
+/// \param color The color of the cube with format { r, g, b, a }. Components
+///     are represented in the range [0, 1]. Any component outside this range
+///     is assumed to be in the range [0, 255] and is normalized to [0, 1].
+/// \return The resulting visualization marker or a default-constructed
+///     visualization marker if any parameter is incorrectly formatted.
+visualization_msgs::Marker getCubeMarker(
+    const std::vector<double>& cube,
+    const std::vector<double>& color,
+    const std::string& frame_id,
+    const std::string& ns,
+    int id = 0);
+
+/// \brief Return a visualization marker representing a cube.
+///
+/// \param dim The dimensions of the cube with format { length, width, height }
+/// \param color The color of the cube with format { r, g, b, a }. Components
+///     are represented in the range [0, 1]. Any component outside this range
+///     is assumed to be in the range [0, 255] and is normalized to [0, 1].
+/// \return The resulting visualization marker or a default-constructed
+///     visualization marker if any parameter is incorrectly formatted.
+visualization_msgs::Marker getCubeMarker(
+    const geometry_msgs::Pose& pose,
+    const std::vector<double>& dim,
+    const std::vector<double>& color,
+    const std::string& frame_id,
+    const std::string& ns,
+    int id = 0);
+
+/// \brief Return a visualization marker representing a set of cubes.
+visualization_msgs::Marker getCubesMarker(
+    const std::vector<std::vector<double>>& points,
+    double size,
+    const std::vector<double>& color,
+    const std::string& frame_id,
+    const std::string& ns,
+    int id = 0);
+
+visualization_msgs::Marker getCubesMarker(
+    const std::vector<geometry_msgs::Point>& points,
+    double size,
+    const std_msgs::ColorRGBA& color,
+    const std::string& frame_id,
+    const std::string& ns,
+    int id = 0);
+
+/// \brief Return a visualization marker representing a set of cubes.
+visualization_msgs::MarkerArray getCubesMarkerArray(
+    const std::vector<std::vector<double>>& poses,
+    double size,
+    const std::vector<std::vector<double>>& color,
+    const std::string& frame_id,
+    const std::string& ns,
+    int id = 0);
+
+/// \brief Return a visualization marker array representing a pose.
+///
+/// The pose is represented as a sphere located at the pose origin with an arrow
+/// pointing along the x-axis. An optional text marker above the pose displaying
+/// the namespace via \p may be requested.
 visualization_msgs::MarkerArray getPoseMarkerArray(
     const geometry_msgs::Pose& pose,
     const std::string& frame_id,
@@ -24,12 +97,14 @@ visualization_msgs::MarkerArray getPoseMarkerArray(
     int id = 0,
     bool text = false);
 
+/// \brief Return a visualization marker array representing a pose.
 visualization_msgs::MarkerArray getPoseMarkerArray(
     const geometry_msgs::PoseStamped &pose,
     const std::string& ns,
     int id = 0,
     bool text = false);
 
+/// \brief Return a visualization marker array representing a pose.
 visualization_msgs::MarkerArray getPosesMarkerArray(
     const std::vector<std::vector<double>>& poses,
     const std::string& frame_id,
@@ -37,6 +112,7 @@ visualization_msgs::MarkerArray getPosesMarkerArray(
     int id = 0,
     bool text = false);
 
+/// \brief Return a visualization marker array representing a pose.
 visualization_msgs::MarkerArray getPosesMarkerArray(
     const std::vector<geometry_msgs::Pose>& poses,
     const std::string& frame_id,
@@ -110,45 +186,6 @@ visualization_msgs::Marker getTextMarker(
     std::vector<double> color,
     std::string frame_id,
     std::string ns,
-    int id = 0);
-
-/* Cubes */
-visualization_msgs::Marker getCubeMarker(
-    geometry_msgs::PoseStamped pose,
-    std::vector<double> dim,
-    int hue,
-    std::string ns,
-    int id = 0);
-
-visualization_msgs::Marker getCubeMarker(
-    std::vector<double> &cube,
-    std::vector<double> &color,
-    std::string frame_id,
-    std::string ns,
-    int id = 0);
-
-visualization_msgs::Marker getCubeMarker(
-    geometry_msgs::Pose &pose,
-    std::vector<double> &dim,
-    std::vector<double> &color,
-    std::string frame_id,
-    std::string ns,
-    int id = 0);
-
-visualization_msgs::Marker getCubesMarker(
-    const std::vector<std::vector<double> > &poses,
-    double size,
-    const std::vector<double> &color,
-    std::string frame_id,
-    std::string ns,
-    int id = 0);
-
-visualization_msgs::MarkerArray getCubesMarkerArray(
-    const std::vector<std::vector<double>>& poses,
-    double size,
-    const std::vector<std::vector<double>>& color,
-    const std::string& frame_id,
-    const std::string& ns,
     int id = 0);
 
 /* Meshes */

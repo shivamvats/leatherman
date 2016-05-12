@@ -6,74 +6,215 @@
 namespace viz {
 
 visualization_msgs::Marker getCubeMarker(
-    geometry_msgs::PoseStamped pose,
-    std::vector<double> dim,
+    const geometry_msgs::PoseStamped& pose,
+    const std::vector<double>& dim,
     int hue,
-    std::string ns,
+    const std::string& ns,
     int id)
 {
-    std::vector<double> color(4,1);
+    std::vector<double> color(4, 1.0);
     leatherman::HSVtoRGB(&(color[0]), &(color[1]), &(color[2]), hue, 1.0, 1.0);
     return getCubeMarker(pose.pose, dim, color, pose.header.frame_id, ns, id);
 }
 
-visualization_msgs::Marker getCubeMarker(std::vector<double> &cube, std::vector<double> &color, std::string frame_id, std::string ns, int id)
+visualization_msgs::Marker getCubeMarker(
+    const std::vector<double>& cube,
+    const std::vector<double>& color,
+    const std::string& frame_id,
+    const std::string& ns,
+    int id)
 {
-  if(cube.size() < 6)
-  {
-    ROS_ERROR("Expecting a cube vector with 6 values. {x,y,z,dimx,dimy,dimz}");
-    return visualization_msgs::Marker();
-  }
+    if (cube.size() < 6) {
+        ROS_ERROR("Expecting a cube vector with 6 values. { x, y, z, dimx, dimy, dimz }");
+        return visualization_msgs::Marker();
+    }
 
-  std::vector<double> dim(3,0);
-  dim[0] = cube[3]; dim[1] = cube[4]; dim[2] = cube[5];
+    std::vector<double> dim(3, 0.0);
+    dim[0] = cube[3];
+    dim[1] = cube[4];
+    dim[2] = cube[5];
 
-  geometry_msgs::Pose pose;
-  pose.position.x = cube[0];
-  pose.position.y= cube[1];
-  pose.position.z = cube[2];
-  pose.orientation.w = 1;
-  return getCubeMarker(pose, dim, color, frame_id, ns, id);
+    geometry_msgs::Pose pose;
+    pose.position.x = cube[0];
+    pose.position.y = cube[1];
+    pose.position.z = cube[2];
+    pose.orientation.w = 1.0;
+    return getCubeMarker(pose, dim, color, frame_id, ns, id);
 }
 
-visualization_msgs::Marker getCubeMarker(geometry_msgs::Pose &pose, std::vector<double> &dim, std::vector<double> &color, std::string frame_id, std::string ns, int id)
+visualization_msgs::Marker getCubeMarker(
+    const geometry_msgs::Pose& pose,
+    const std::vector<double>& dim,
+    const std::vector<double>& color,
+    const std::string& frame_id,
+    const std::string& ns,
+    int id)
 {
-  visualization_msgs::Marker marker;
+    visualization_msgs::Marker marker;
 
-  if(dim.size() < 3)
-  {
-    ROS_INFO("Three dimensions are needed to visualize a cube.");
+    if (dim.size() < 3) {
+        ROS_INFO("Three dimensions are needed to visualize a cube.");
+        return marker;
+    }
+
+    if (color.size() < 4) {
+        ROS_ERROR("No color specified.");
+        return marker;
+    }
+
+    marker.header.stamp = ros::Time::now();
+    marker.header.frame_id = frame_id;
+    marker.ns = ns;
+    marker.id = id;
+    marker.type = visualization_msgs::Marker::CUBE;
+    marker.action = visualization_msgs::Marker::ADD;
+    marker.pose = pose;
+    marker.scale.x = dim[0];
+    marker.scale.y = dim[1];
+    marker.scale.z = dim[2];
+    marker.color.r = color[0] > 1 ? color[0] / 255.0f : color[0];
+    marker.color.g = color[1] > 1 ? color[1] / 255.0f : color[1];
+    marker.color.b = color[2] > 1 ? color[2] / 255.0f : color[2];
+    marker.color.a = color[3] > 1 ? color[3] / 255.0f : color[3];
+    marker.lifetime = ros::Duration(0);
     return marker;
-  }
-  if(color.size() < 4)
-  {
-    ROS_ERROR("No color specified.");
-    return marker;
-  }
-
-  for(size_t i = 0; i < color.size(); ++i)
-  {
-    if(color[i] > 1)
-      color[i] = color[i] / 255.0;
-  }
-
-  marker.header.stamp = ros::Time::now();
-  marker.header.frame_id = frame_id;
-  marker.ns = ns;
-  marker.id = id;
-  marker.type = visualization_msgs::Marker::CUBE;
-  marker.action = visualization_msgs::Marker::ADD;
-  marker.pose = pose;
-  marker.scale.x = dim[0];
-  marker.scale.y = dim[1];
-  marker.scale.z = dim[2];
-  marker.color.r = color[0];
-  marker.color.g = color[1];
-  marker.color.b = color[2];
-  marker.color.a = color[3];
-  marker.lifetime = ros::Duration(0);
-  return marker;
 }
+
+visualization_msgs::Marker getCubesMarker(
+    const std::vector<std::vector<double>>& points,
+    double size,
+    const std::vector<double>& color,
+    const std::string& frame_id,
+    const std::string& ns,
+    int id)
+{
+    if (color.size() < 4) {
+        ROS_WARN("color has insufficient fields (expected: 5, actual: %zu)", color.size());
+        return visualization_msgs::Marker();
+    }
+
+    std_msgs::ColorRGBA c;
+    c.r = color[0];
+    c.g = color[1];
+    c.b = color[2];
+    c.a = color[3];
+
+    std::vector<geometry_msgs::Point> pts;
+    pts.reserve(points.size());
+    for (const auto& point : points) {
+        if (points.size() >= 3) {
+            geometry_msgs::Point pt;
+            pt.x = point[0];
+            pt.y = point[1];
+            pt.z = point[2];
+        }
+        else {
+            ROS_WARN("A cube pose was received with fewer than 3 values { x, y, z }");
+        }
+    }
+
+    return getCubesMarker(pts, size, c, frame_id, ns, id);
+}
+
+visualization_msgs::Marker getCubesMarker(
+    const std::vector<geometry_msgs::Point>& points,
+    double size,
+    const std_msgs::ColorRGBA& color,
+    const std::string& frame_id,
+    const std::string& ns,
+    int id)
+{
+    visualization_msgs::Marker marker;
+
+    marker.header.seq = 0;
+    marker.header.stamp = ros::Time::now();
+    marker.header.frame_id = frame_id;
+    marker.ns = ns;
+    marker.id = id;
+    marker.type = visualization_msgs::Marker::CUBE_LIST;
+    marker.action = visualization_msgs::Marker::ADD;
+    marker.scale.x = size;
+    marker.scale.y = size;
+    marker.scale.z = size;
+    marker.color.r = color.r > 1.0 ? color.r / 255.0f : color.r;
+    marker.color.g = color.g > 1.0 ? color.g / 255.0f : color.g;
+    marker.color.b = color.b > 1.0 ? color.b / 255.0f : color.b;
+    marker.color.a = color.a > 1.0 ? color.a / 255.0f : color.a;
+    marker.lifetime = ros::Duration(0);
+    marker.frame_locked = false;
+    marker.points = points;
+
+    return marker;
+}
+
+visualization_msgs::MarkerArray getCubesMarkerArray(
+    const std::vector<std::vector<double>>& poses,
+    double scale,
+    const std::vector<std::vector<double>>& color,
+    const std::string& frame_id,
+    const std::string& ns,
+    int id)
+{
+    if (color.size() < 2) {
+        ROS_INFO("Not enough colors specified. Expecting two colors {2x4}.");
+        return visualization_msgs::MarkerArray();
+    }
+
+    if (color[0].size() < 4 || color[1].size() < 4) {
+        ROS_INFO("RGBA must be specified for each color.");
+        return visualization_msgs::MarkerArray();
+    }
+
+    visualization_msgs::Marker marker;
+
+    marker.header.seq = 0;
+    marker.header.stamp = ros::Time::now();
+    marker.header.frame_id = frame_id;
+    marker.ns = ns;
+    marker.id = id;
+    marker.type = visualization_msgs::Marker::CUBE_LIST;
+    marker.action =  visualization_msgs::Marker::ADD;
+    // marker.pose;
+    marker.scale.x = scale;
+    marker.scale.y = scale;
+    marker.scale.z = scale;
+    // marker.color;
+    marker.lifetime = ros::Duration(0);
+    marker.frame_locked = false;
+
+    std::vector<geometry_msgs::Point> points;
+    std::vector<std_msgs::ColorRGBA> colors;
+
+    points.reserve(poses.size());
+    colors.reserve(poses.size());
+
+    for (size_t i = 0; i < poses.size(); ++i) {
+        geometry_msgs::Point p;
+        p.x = poses[i][0];
+        p.y = poses[i][1];
+        p.z = poses[i][2];
+
+        std_msgs::ColorRGBA c;
+
+        // interpolate color
+        const double alpha = ((double)i) / ((double)poses.size());
+        c.r = color[0][0] - (color[0][0] - color[1][0]) * alpha;
+        c.g = color[0][1] - (color[0][1] - color[1][1]) * alpha;
+        c.b = color[0][2] - (color[0][2] - color[1][2]) * alpha;
+        c.a = color[0][3] - (color[0][3] - color[1][3]) * alpha;
+
+        points.push_back(p);
+        colors.push_back(c);
+    }
+
+    marker.points = std::move(points);
+    marker.colors = std::move(colors);
+
+    visualization_msgs::MarkerArray ma;
+    ma.markers.push_back(marker);
+    return ma;
+}
+
 
 visualization_msgs::MarkerArray getPosesMarkerArray(
     const std::vector<std::vector<double>>& poses,
@@ -206,30 +347,38 @@ visualization_msgs::MarkerArray getPoseMarkerArray(
     return getPoseMarkerArray(pose.pose, pose.header.frame_id, ns, id, false);
 }
 
-visualization_msgs::Marker getSphereMarker(double x, double y, double z, double radius, int hue, std::string frame_id, std::string ns, int id)
+visualization_msgs::Marker getSphereMarker(
+    double x,
+    double y,
+    double z,
+    double radius,
+    int hue,
+    std::string frame_id,
+    std::string ns,
+    int id)
 {
-  double r=0,g=0,b=0;
-  visualization_msgs::Marker marker;
-  leatherman::HSVtoRGB(&r, &g, &b, hue, 1.0, 1.0);
+    double r = 0, g = 0, b = 0;
+    visualization_msgs::Marker marker;
+    leatherman::HSVtoRGB(&r, &g, &b, hue, 1.0, 1.0);
 
-  marker.header.stamp = ros::Time::now();
-  marker.header.frame_id = frame_id;
-  marker.ns = ns;
-  marker.id = id;
-  marker.type = visualization_msgs::Marker::SPHERE;
-  marker.action = visualization_msgs::Marker::ADD;
-  marker.pose.position.x = x;
-  marker.pose.position.y = y;
-  marker.pose.position.z = z;
-  marker.scale.x = radius*2;
-  marker.scale.y = radius*2;
-  marker.scale.z = radius*2;
-  marker.color.r = r;
-  marker.color.g = g;
-  marker.color.b = b;
-  marker.color.a = 1.0;
-  marker.lifetime = ros::Duration(0);
-  return marker;
+    marker.header.stamp = ros::Time::now();
+    marker.header.frame_id = frame_id;
+    marker.ns = ns;
+    marker.id = id;
+    marker.type = visualization_msgs::Marker::SPHERE;
+    marker.action = visualization_msgs::Marker::ADD;
+    marker.pose.position.x = x;
+    marker.pose.position.y = y;
+    marker.pose.position.z = z;
+    marker.scale.x = radius * 2.0f;
+    marker.scale.y = radius * 2.0f;
+    marker.scale.z = radius * 2.0f;
+    marker.color.r = r;
+    marker.color.g = g;
+    marker.color.b = b;
+    marker.color.a = 1.0;
+    marker.lifetime = ros::Duration(0);
+    return marker;
 }
 
 visualization_msgs::Marker getSpheresMarker(
@@ -377,126 +526,6 @@ visualization_msgs::MarkerArray getRemoveMarkerArray(std::string ns, int max_id)
   for(int j = 0; j < max_id; ++j)
     marker_array.markers[j].id = j;
   return marker_array;
-}
-
-visualization_msgs::Marker getCubesMarker(const std::vector<std::vector<double> > &poses, double size, const std::vector<double> &color, std::string frame_id, std::string ns, int id)
-{
-  visualization_msgs::Marker marker;
-
-  //check if the list is empty
-  if(poses.empty())
-  {
-    ROS_DEBUG("There are no poses in the %s poses list.", ns.c_str());
-    return marker;
-  }
-
-  if(poses.size() > 50000)
-    ROS_WARN("RViz may crash and burn when visualizing so many cubes.");
-
-  marker.header.seq = 0;
-  marker.header.stamp = ros::Time::now();
-  marker.header.frame_id = frame_id;
-  marker.ns = ns;
-  marker.id = id;
-  marker.type = visualization_msgs::Marker::POINTS;
-  marker.action = visualization_msgs::Marker::ADD;
-  marker.scale.x = size;
-  marker.scale.y = size;
-  marker.scale.z = size;
-  marker.color.r = color[0];
-  marker.color.g = color[1];
-  marker.color.b = color[2];
-  marker.color.a = color[3];
-  marker.lifetime = ros::Duration(0);
-
-  marker.points.resize(poses.size());
-  for(size_t i = 0; i < poses.size(); ++i)
-  {
-    if(poses[i].size() >= 3)
-    {
-      marker.points[i].x = poses[i][0];
-      marker.points[i].y = poses[i][1];
-      marker.points[i].z = poses[i][2];
-    }
-    else
-      ROS_WARN("A cube pose was received with fewer than 3 values {x,y,z}. Not visualizing.");
-  }
-
-  return marker;
-}
-
-visualization_msgs::MarkerArray getCubesMarkerArray(
-    const std::vector<std::vector<double>>& poses,
-    double scale,
-    const std::vector<std::vector<double>>& color,
-    const std::string& frame_id,
-    const std::string& ns,
-    int id)
-{
-    //check if the list is empty
-    if (poses.empty()) {
-        ROS_WARN("There are no poses in the %s poses list", ns.c_str());
-        return visualization_msgs::MarkerArray();
-    }
-
-    if (color.size() < 2) {
-        ROS_INFO("Not enough colors specified. Expecting two colors {2x4}.");
-        return visualization_msgs::MarkerArray();
-    }
-
-    if (color[0].size() < 4 || color[1].size() < 4) {
-        ROS_INFO("RGBA must be specified for each color.");
-        return visualization_msgs::MarkerArray();
-    }
-
-    visualization_msgs::Marker marker;
-
-    marker.header.seq = 0;
-    marker.header.stamp = ros::Time::now();
-    marker.header.frame_id = frame_id;
-    marker.ns = ns;
-    marker.id = id;
-    marker.type = visualization_msgs::Marker::CUBE_LIST;
-    marker.action =  visualization_msgs::Marker::ADD;
-    // marker.pose;
-    marker.scale.x = scale;
-    marker.scale.y = scale;
-    marker.scale.z = scale;
-    // marker.color;
-    marker.lifetime = ros::Duration(0);
-    marker.frame_locked = false;
-
-    std::vector<geometry_msgs::Point> points;
-    std::vector<std_msgs::ColorRGBA> colors;
-
-    points.reserve(poses.size());
-    colors.reserve(poses.size());
-
-    for (size_t i = 0; i < poses.size(); ++i) {
-        geometry_msgs::Point p;
-        p.x = poses[i][0];
-        p.y = poses[i][1];
-        p.z = poses[i][2];
-
-        std_msgs::ColorRGBA c;
-
-        // interpolate color
-        const double alpha = ((double)i) / ((double)poses.size());
-        c.r = color[0][0] - (color[0][0] - color[1][0]) * alpha;
-        c.g = color[0][1] - (color[0][1] - color[1][1]) * alpha;
-        c.b = color[0][2] - (color[0][2] - color[1][2]) * alpha;
-        c.a = color[0][3] - (color[0][3] - color[1][3]) * alpha;
-
-        points.push_back(p);
-        colors.push_back(c);
-    }
-
-    marker.points = std::move(points);
-    marker.colors = std::move(colors);
-
-    visualization_msgs::MarkerArray ma;
-    ma.markers.push_back(marker);
-    return ma;
 }
 
 visualization_msgs::Marker getLineMarker(
