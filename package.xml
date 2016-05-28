@@ -11,7 +11,6 @@
 
   <build_depend>angles</build_depend>
   <build_depend>boost</build_depend>
-  <build_depend>bullet</build_depend>
   <build_depend>eigen</build_depend>
   <build_depend>geometric_shapes</build_depend>
   <build_depend>geometry_msgs</build_depend>
@@ -29,7 +28,6 @@
 
   <run_depend>angles</run_depend>
   <run_depend>boost</run_depend>
-  <run_depend>bullet</run_depend>
   <run_depend>eigen</run_depend>
   <run_depend>geometric_shapes</run_depend>
   <run_depend>geometry_msgs</run_depend>

@@ -6,9 +6,6 @@ set(CMAKE_BUILD_TYPE Release)
 find_package(Boost REQUIRED)
 include_directories(${Boost_INCLUDE_DIRS})
 
-find_package(Bullet REQUIRED)
-include_directories(${BULLET_INCLUDE_DIRS})
-
 find_package(Eigen REQUIRED)
 include_directories(${EIGEN_INCLUDE_DIRS})
 add_definitions(${EIGEN_DEFINITIONS})
@@ -48,7 +45,7 @@ catkin_package(INCLUDE_DIRS include
                    trajectory_msgs
                    urdf 
                    visualization_msgs
-               DEPENDS boost bullet eigen
+               DEPENDS boost eigen
                LIBRARIES ${PROJECT_NAME})
 
 add_library(${PROJECT_NAME}
@@ -59,7 +56,7 @@ add_library(${PROJECT_NAME}
             src/stl.cpp
             src/utils.cpp 
             src/viz.cpp)
-target_link_libraries(${PROJECT_NAME} ${catkin_LIBRARIES} ${BULLET_LIBRARIES})
+target_link_libraries(${PROJECT_NAME} ${catkin_LIBRARIES} )
 
 install(TARGETS ${PROJECT_NAME}
         ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
