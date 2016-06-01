@@ -1,0 +1,66 @@
+<package>
+  <name>leatherman</name>
+  <version>1.0.0</version>
+  <description>leatherman</description>
+  <maintainer email="ben@abc.com">Benjamin Cohen</maintainer>
+
+  <license>BSD</license>
+
+  <url type="website">http://ros.org/wiki/leatherman</url>
+  <!-- <url type="bugtracker"></url> -->
+
+  <author>Benjamin Cohen</author>
+
+  <!-- Dependencies which this package needs to build itself. -->
+  <buildtool_depend>catkin</buildtool_depend>
+
+  <!-- Dependencies needed to compile this package. -->
+  <build_depend>roscpp</build_depend>
+  <build_depend>bullet</build_depend>
+  <build_depend>tf</build_depend>
+  <build_depend>angles</build_depend>
+  <build_depend>sensor_msgs</build_depend>
+  <build_depend>geometry_msgs</build_depend>
+  <build_depend>geometric_shapes</build_depend>
+  <build_depend>trajectory_msgs</build_depend>
+  <build_depend>visualization_msgs</build_depend>
+  <build_depend>arm_navigation_msgs</build_depend>
+  <build_depend>shape_msgs</build_depend>
+  <build_depend>orocos_kdl</build_depend>
+  <build_depend>urdf</build_depend>
+
+  <!-- Dependencies needed after this package is compiled. -->
+  <run_depend>roscpp</run_depend>
+  <run_depend>bullet</run_depend>
+  <run_depend>tf</run_depend>
+  <run_depend>angles</run_depend>
+  <run_depend>sensor_msgs</run_depend>
+  <run_depend>geometry_msgs</run_depend>
+  <run_depend>geometric_shapes</run_depend>
+  <run_depend>trajectory_msgs</run_depend>
+  <run_depend>visualization_msgs</run_depend>
+  <run_depend>arm_navigation_msgs</run_depend>
+  <run_depend>shape_msgs</run_depend>
+  <run_depend>orocos_kdl</run_depend>
+  <run_depend>urdf</run_depend>
+
+  <!-- Dependencies needed only for running tests. -->
+  <!-- <test_depend>roscpp</test_depend> -->
+  <!-- <test_depend>bullet</test_depend> -->
+  <!-- <test_depend>tf</test_depend> -->
+  <!-- <test_depend>angles</test_depend> -->
+  <!-- <test_depend>sensor_msgs</test_depend> -->
+  <!-- <test_depend>geometry_msgs</test_depend> -->
+  <!-- <test_depend>geometric_shapes</test_depend> -->
+  <!-- <test_depend>trajectory_msgs</test_depend> -->
+  <!-- <test_depend>visualization_msgs</test_depend> -->
+  <!-- <test_depend>arm_navigation_msgs</test_depend> -->
+  <!-- <test_depend>shape_msgs</test_depend> -->
+  <!-- <test_depend>kdl</test_depend> -->
+  <!-- <test_depend>urdf</test_depend> -->
+
+<export>
+    <cpp lflags="-Wl,-rpath,${prefix}/lib -L${prefix}/lib -lleatherman" cflags="-I${prefix}/include  -O3 -g"/>
+</export>
+
+</package>
