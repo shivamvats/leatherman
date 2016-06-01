@@ -28,6 +28,8 @@
   <build_depend>shape_msgs</build_depend>
   <build_depend>orocos_kdl</build_depend>
   <build_depend>urdf</build_depend>
+  <build_depend>octomap_msgs</build_depend>
+  <build_depend>octomap_ros</build_depend>
 
   <!-- Dependencies needed after this package is compiled. -->
   <run_depend>roscpp</run_depend>
@@ -43,6 +45,8 @@
   <run_depend>shape_msgs</run_depend>
   <run_depend>orocos_kdl</run_depend>
   <run_depend>urdf</run_depend>
+  <run_depend>octomap_ros</run_depend>
+  <run_depend>octomap_msgs</run_depend>
 
   <!-- Dependencies needed only for running tests. -->
   <!-- <test_depend>roscpp</test_depend> -->
