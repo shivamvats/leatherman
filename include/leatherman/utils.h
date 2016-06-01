@@ -219,7 +219,10 @@ bool getJointLimits(
     double &max_limit,
     bool &continuous);
 
-/* Colors */
+/// \brief Convert an (H, S, V) color triplet to (R, G, B) format.
+/// \param h The hue in range [0, 360)
+/// \param s The saturation in range [0, 1]
+/// \param v The value in range [0, 1]
 void HSVtoRGB(double* r, double* g, double* b, double h, double s, double v);
 
 /* ROS Logging */

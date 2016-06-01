@@ -171,21 +171,21 @@ visualization_msgs::Marker getLineMarker(
 
 /* Text */
 visualization_msgs::Marker getTextMarker(
-    geometry_msgs::Pose pose,
-    std::string text,
+    const geometry_msgs::Pose& pose,
+    const std::string& text,
     double size,
     int hue,
-    std::string frame_id,
-    std::string ns,
+    const std::string& frame_id,
+    const std::string& ns,
     int id = 0);
 
 visualization_msgs::Marker getTextMarker(
-    geometry_msgs::Pose pose,
-    std::string text,
+    const geometry_msgs::Pose& pose,
+    const std::string& text,
     double size,
-    std::vector<double> color,
-    std::string frame_id,
-    std::string ns,
+    const std::vector<double>& color,
+    const std::string& frame_id,
+    const std::string& ns,
     int id = 0);
 
 /* Meshes */

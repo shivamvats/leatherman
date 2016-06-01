@@ -559,42 +559,56 @@ visualization_msgs::Marker getLineMarker(
     return marker;
 }
 
-visualization_msgs::Marker getTextMarker(geometry_msgs::Pose pose, std::string text, double size, int hue, std::string frame_id, std::string ns, int id)
+visualization_msgs::Marker getTextMarker(
+    const geometry_msgs::Pose& pose,
+    const std::string& text,
+    double size,
+    int hue,
+    const std::string& frame_id,
+    const std::string& ns,
+    int id)
 {
-  std::vector<double> color(4,1);
-  leatherman::HSVtoRGB(&(color[0]), &(color[1]), &(color[2]), hue, 1.0, 1.0);
+    std::vector<double> color(4, 1.0);
+    leatherman::HSVtoRGB(&(color[0]), &(color[1]), &(color[2]), hue, 1.0, 1.0);
 
-  return getTextMarker(pose, text, size, color, frame_id, ns, id);
+    return getTextMarker(pose, text, size, color, frame_id, ns, id);
 }
 
-visualization_msgs::Marker getTextMarker(geometry_msgs::Pose pose, std::string text, double size, std::vector<double> color, std::string frame_id, std::string ns, int id)
+visualization_msgs::Marker getTextMarker(
+    const geometry_msgs::Pose& pose,
+    const std::string& text,
+    double size,
+    const std::vector<double>& color,
+    const std::string& frame_id,
+    const std::string& ns,
+    int id)
 {
-  visualization_msgs::Marker marker;
+    visualization_msgs::Marker marker;
 
-  if(color.size() < 4)
-    color.resize(4,1);
+    if (color.size() < 4) {
+        ROS_ERROR("No color specified");
+        return marker;
+    }
 
-  marker.header.stamp = ros::Time::now();
-  marker.header.frame_id = frame_id;
-  marker.ns = ns;
-  marker.id = id;
-  marker.type = visualization_msgs::Marker::TEXT_VIEW_FACING;
-  marker.action = visualization_msgs::Marker::ADD;
-  marker.scale.x = size;
-  marker.scale.y = size;
-  marker.scale.z = size;
-  marker.pose = pose;
+    marker.header.stamp = ros::Time::now();
+    marker.header.frame_id = frame_id;
+    marker.ns = ns;
+    marker.id = id;
+    marker.type = visualization_msgs::Marker::TEXT_VIEW_FACING;
+    marker.action = visualization_msgs::Marker::ADD;
+    marker.scale.x = size;
+    marker.scale.y = size;
+    marker.scale.z = size;
+    marker.pose = pose;
 
-  marker.color.r = color[0];
-  marker.color.g = color[1];
-  marker.color.b = color[2];
-  marker.color.a = color[3];
-  marker.text = text;
-  marker.lifetime = ros::Duration(0);
-  return marker;
+    marker.color.r = color[0];
+    marker.color.g = color[1];
+    marker.color.b = color[2];
+    marker.color.a = color[3];
+    marker.text = text;
+    marker.lifetime = ros::Duration(0);
+    return marker;
 }
-
-
 
 visualization_msgs::Marker getMeshMarker(const geometry_msgs::PoseStamped &pose, const std::string &mesh_resource, int hue, std::string ns, int id)
 {

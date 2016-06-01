@@ -701,53 +701,55 @@ bool leatherman::getChainTip(const KDL::Tree &tree, const std::vector<std::strin
   return false;
 }
 
-void leatherman::HSVtoRGB( double *r, double *g, double *b, double h, double s, double v)
+void leatherman::HSVtoRGB(
+    double* r, double* g, double* b,
+    double h, double s, double v)
 {
-  int i;
-  double f, p, q, t;
-  if( s == 0 ) {
-    // achromatic (grey)
-    *r = *g = *b = v;
-    return;
-  }
-  h /= 60;        // sector 0 to 5
-  i = floor(h);
-  f = h - i;      // factorial part of h
-  p = v * ( 1 - s );
-  q = v * ( 1 - s * f );
-  t = v * ( 1 - s * ( 1 - f ) );
-  switch( i ) {
+    int i;
+    double f, p, q, t;
+    if (s == 0) {
+        // achromatic (grey)
+        *r = *g = *b = v;
+        return;
+    }
+    h /= 60.0;      // sector 0 to 5
+    i = floor(h);
+    f = h - i;      // factorial part of h
+    p = v * (1.0 - s);
+    q = v * (1.0 - s * f);
+    t = v * (1.0 - s * (1.0 - f));
+    switch (i) {
     case 0:
-      *r = v;
-      *g = t;
-      *b = p;
-      break;
+        *r = v;
+        *g = t;
+        *b = p;
+        break;
     case 1:
-      *r = q;
-      *g = v;
-      *b = p;
-      break;
+        *r = q;
+        *g = v;
+        *b = p;
+        break;
     case 2:
-      *r = p;
-      *g = v;
-      *b = t;
-      break;
+        *r = p;
+        *g = v;
+        *b = t;
+        break;
     case 3:
-      *r = p;
-      *g = q;
-      *b = v;
-      break;
+        *r = p;
+        *g = q;
+        *b = v;
+        break;
     case 4:
-      *r = t;
-      *g = p;
-      *b = v;
-      break;
+        *r = t;
+        *g = p;
+        *b = v;
+        break;
     default:
-      *r = v;
-      *g = p;
-      *b = q;
-      break;
-  }
+        *r = v;
+        *g = p;
+        *b = q;
+        break;
+    }
 }
 
 void leatherman::setLoggerLevel(std::string package, std::string name, std::string level)
@@ -921,12 +923,12 @@ bool leatherman::getJointLimits(
         link = urdf->getLink(link->getParent()->name);
     }
     ROS_DEBUG("%d joints found.", num_joints);
-    
+
     min_limits.resize(num_joints);
     max_limits.resize(num_joints);
     joint_names.resize(num_joints);
     continuous.resize(num_joints, false);
-    
+
     // gather limits for all joints between tip and link
     link = urdf->getLink(tip_name);
     unsigned int i = 0;
@@ -941,7 +943,7 @@ bool leatherman::getJointLimits(
             if (joint->type != urdf::Joint::CONTINUOUS) {
                 joint_names[num_joints-i-1] = joint->name;
                 continuous[num_joints-i-1] = false;
-        
+
                 if (joint->safety == NULL) {
                     min_limits[num_joints-i-1] = joint->limits->lower;
                     max_limits[num_joints-i-1] = joint->limits->upper;
@@ -982,7 +984,7 @@ bool leatherman::getJointLimits(
         if (joint->name.compare(joint_name) == 0) {
             if (joint->type != urdf::Joint::UNKNOWN && joint->type != urdf::Joint::FIXED) {
                 if (joint->type != urdf::Joint::CONTINUOUS) {
-                    continuous = false; 
+                    continuous = false;
                     if (joint->safety == NULL) {
                         min_limit = joint->limits->lower;
                         max_limit = joint->limits->upper;
