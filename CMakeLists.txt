@@ -37,7 +37,6 @@ catkin_package(INCLUDE_DIRS include
                    trajectory_msgs
                    urdf 
                    visualization_msgs
-		   cmake_modules
                DEPENDS boost eigen
                LIBRARIES ${PROJECT_NAME})
 
