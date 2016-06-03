@@ -4,11 +4,7 @@ project(leatherman)
 set(CMAKE_BUILD_TYPE Release)
 
 find_package(Boost REQUIRED)
-include_directories(${Boost_INCLUDE_DIRS})
 
-find_package(Eigen REQUIRED)
-include_directories(${EIGEN_INCLUDE_DIRS})
-add_definitions(${EIGEN_DEFINITIONS})
 
 find_package(catkin REQUIRED
              COMPONENTS
@@ -25,11 +21,10 @@ find_package(catkin REQUIRED
                 tf 
                 trajectory_msgs
                 urdf 
-                visualization_msgs)
-include_directories(${catkin_INCLUDE_DIRS})
+                visualization_msgs
+		cmake_modules)
 
-include_directories(include)
-
+find_package(Eigen REQUIRED)
 catkin_package(INCLUDE_DIRS include
                CATKIN_DEPENDS
                    angles 
@@ -45,8 +40,18 @@ catkin_package(INCLUDE_DIRS include
                    trajectory_msgs
                    urdf 
                    visualization_msgs
+		   cmake_modules
                DEPENDS boost eigen
                LIBRARIES ${PROJECT_NAME})
+
+include_directories(${Boost_INCLUDE_DIRS})
+
+include_directories(${EIGEN_INCLUDE_DIRS})
+add_definitions(${EIGEN_DEFINITIONS})
+
+include_directories(${catkin_INCLUDE_DIRS})
+
+include_directories(include)
 
 add_library(${PROJECT_NAME}
             src/binvox.cpp
