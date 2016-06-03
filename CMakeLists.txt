@@ -3,9 +3,6 @@ project(leatherman)
 
 set(CMAKE_BUILD_TYPE Release)
 
-find_package(Boost REQUIRED)
-
-
 find_package(catkin REQUIRED
              COMPONENTS
                 angles 
@@ -14,7 +11,6 @@ find_package(catkin REQUIRED
                 arm_navigation_msgs
                 octomap_ros
                 octomap_msgs
-                orocos_kdl 
                 roscpp 
                 sensor_msgs 
                 shape_msgs
@@ -24,7 +20,8 @@ find_package(catkin REQUIRED
                 visualization_msgs
 		cmake_modules)
 
-find_package(Eigen REQUIRED)
+find_package(Boost Eigen orocos_kdl REQUIRED)
+
 catkin_package(INCLUDE_DIRS include
                CATKIN_DEPENDS
                    angles 
@@ -44,14 +41,9 @@ catkin_package(INCLUDE_DIRS include
                DEPENDS boost eigen
                LIBRARIES ${PROJECT_NAME})
 
-include_directories(${Boost_INCLUDE_DIRS})
-
-include_directories(${EIGEN_INCLUDE_DIRS})
 add_definitions(${EIGEN_DEFINITIONS})
 
-include_directories(${catkin_INCLUDE_DIRS})
-
-include_directories(include)
+include_directories(include ${catkin_INCLUDE_DIRS} ${EIGEN_INCLUDE_DIRS} ${Boost_INCLUDE_DIRS})
 
 add_library(${PROJECT_NAME}
             src/binvox.cpp
