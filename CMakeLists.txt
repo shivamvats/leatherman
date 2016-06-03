@@ -20,7 +20,9 @@ find_package(catkin REQUIRED
                 visualization_msgs
 		cmake_modules)
 
-find_package(Boost Eigen orocos_kdl REQUIRED)
+find_package(Boost REQUIRED)
+find_package(Eigen REQUIRED)
+find_package(orocos_kdl REQUIRED)
 
 catkin_package(INCLUDE_DIRS include
                CATKIN_DEPENDS
@@ -30,14 +32,13 @@ catkin_package(INCLUDE_DIRS include
                    arm_navigation_msgs 
                    octomap_ros
                    octomap_msgs 
-                   orocos_kdl 
                    sensor_msgs 
                    shape_msgs
                    tf 
                    trajectory_msgs
                    urdf 
                    visualization_msgs
-               DEPENDS boost eigen
+               DEPENDS boost eigen orocos_kdl
                LIBRARIES ${PROJECT_NAME})
 
 add_definitions(${EIGEN_DEFINITIONS})
