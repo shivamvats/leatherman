@@ -13,6 +13,8 @@
 #include <leatherman/utils.h>
 #include <moveit_msgs/CollisionObject.h>
 #include <shape_msgs/SolidPrimitive.h>
+#include <arm_navigation_msgs/CollisionObject.h>
+#include <arm_navigation_msgs/Shape.h>
 
 namespace viz {
 
@@ -61,7 +63,7 @@ visualization_msgs::Marker getCubeMarker(
 
 /// \brief Return a visualization marker representing a set of cubes.
 visualization_msgs::Marker getCubesMarker(
-    const std::vector<std::vector<double>>& points,
+    const std::vector<std::vector<double> >& points,
     double size,
     const std::vector<double>& color,
     const std::string& frame_id,
@@ -78,9 +80,9 @@ visualization_msgs::Marker getCubesMarker(
 
 /// \brief Return a visualization marker representing a set of cubes.
 visualization_msgs::MarkerArray getCubesMarkerArray(
-    const std::vector<std::vector<double>>& poses,
+    const std::vector<std::vector<double> >& poses,
     double size,
-    const std::vector<std::vector<double>>& color,
+    const std::vector<std::vector<double> >& color,
     const std::string& frame_id,
     const std::string& ns,
     int id = 0);
@@ -106,7 +108,7 @@ visualization_msgs::MarkerArray getPoseMarkerArray(
 
 /// \brief Return a visualization marker array representing a pose.
 visualization_msgs::MarkerArray getPosesMarkerArray(
-    const std::vector<std::vector<double>>& poses,
+    const std::vector<std::vector<double> >& poses,
     const std::string& frame_id,
     const std::string& ns,
     int id = 0,
@@ -130,7 +132,7 @@ visualization_msgs::Marker getSphereMarker(
     int id = 0);
 
 visualization_msgs::Marker getSpheresMarker(
-    const std::vector<std::vector<double>>& poses,
+    const std::vector<std::vector<double> >& poses,
     double radius,
     int hue,
     const std::string& frame_id,
@@ -207,7 +209,7 @@ visualization_msgs::Marker getMeshMarker(
 
 /* Collision Objects */
 visualization_msgs::MarkerArray getShapesMarkerArray(
-    const std::vector<shape_msgs::SolidPrimitive> &shapes,
+    const std::vector<arm_navigation_msgs::Shape> &shapes,
     const std::vector<geometry_msgs::Pose> &poses,
     const std::vector<std::vector<double> >&color,
     std::string frame_id,
@@ -215,7 +217,7 @@ visualization_msgs::MarkerArray getShapesMarkerArray(
     int id);
 
 visualization_msgs::MarkerArray getCollisionObjectMarkerArray(
-    const moveit_msgs::CollisionObject &obj,
+    const arm_navigation_msgs::CollisionObject &obj,
     const std::vector<double> &hue,
     std::string ns,
     int id);

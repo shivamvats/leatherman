@@ -42,7 +42,7 @@ void printAffine3d(const Eigen::Affine3d& a, const std::string& text);
 void printKDLFrame(const KDL::Frame& f, const std::string& text);
 
 void printKDLFrames(
-    const std::vector<std::vector<KDL::Frame>>& f,
+    const std::vector<std::vector<KDL::Frame> >& f,
     const std::string& text);
 
 void printKDLChain(const KDL::Chain& c, const std::string& text);
