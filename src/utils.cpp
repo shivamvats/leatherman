@@ -3,6 +3,7 @@
 #include <resource_retriever/retriever.h>
 #include <tinyxml.h>
 #include <urdf/model.h>
+#include <log4cxx/logger.h>
 
 
 #define SMALL_NUM  0.00000001     // to avoid division overflow
@@ -103,7 +104,7 @@ double leatherman::distanceBetween3DLineSegments(std::vector<int> l1a, std::vect
   return  sqrt(dP[0]*dP[0] + dP[1]*dP[1] + dP[2]*dP[2]);   // return the closest distance
 }
 
-/* Originally from geometric_shapes/shape_operations. Then it 
+/* Originally from geometric_shapes/shape_operations. Then it
  * was moved to pr2_navigation/load_mesh.cpp
  * Written by Ioan Sucan */
 
@@ -126,7 +127,7 @@ shapes::Mesh* leatherman::createMeshFromBinaryStlData(const char *data, unsigned
       // skip the normal
       pos += 12;
 
-      // read vertices 
+      // read vertices
       tf::Vector3 v1(0,0,0);
       tf::Vector3 v2(0,0,0);
       tf::Vector3 v3(0,0,0);
@@ -301,7 +302,7 @@ void leatherman::kdlToPoseVector(const KDL::Frame &k, std::vector<double> &pose)
   pose[0] = k.p[0];
   pose[1] = k.p[1];
   pose[2] = k.p[2];
-  k.M.GetRPY(pose[3], pose[4], pose[5]); 
+  k.M.GetRPY(pose[3], pose[4], pose[5]);
 }
 
 void leatherman::multiplyPoses(geometry_msgs::Pose &p1, geometry_msgs::Pose &p2, geometry_msgs::Pose &p)
@@ -390,13 +391,13 @@ bool leatherman::getIntermediatePoints(trajectory_msgs::JointTrajectoryPoint a, 
 {
   if(a.positions.size() != b.positions.size())
     return false;
-    
+
   double time_inc = (b.time_from_start - a.time_from_start).toSec() / (num_points+1);
   std::vector<double> inc(a.positions.size(),0);
   for(size_t i = 0; i < a.positions.size(); ++i)
     inc[i] = angles::shortest_angular_distance(a.positions[i], b.positions[i]) / (num_points+1);
-     
-  
+
+
   points.resize(num_points);
   for(int i = 0; i < num_points; ++i)
   {
@@ -405,8 +406,8 @@ bool leatherman::getIntermediatePoints(trajectory_msgs::JointTrajectoryPoint a, 
       points[i].positions[j] = a.positions[j] + (i+1)*inc[j];
     points[i].time_from_start = a.time_from_start + ros::Duration((i+1)*(time_inc));
   }
-  return true; 
-} 
+  return true;
+}
 
 tf::Quaternion leatherman::setRPY(const tfScalar& roll, const tfScalar& pitch, const tfScalar& yaw)
 {
@@ -589,12 +590,12 @@ bool leatherman::getJointPosition(const sensor_msgs::JointState &state, std::str
     {
       position = state.position[i];
       break;
-    } 
+    }
   }
   if(i == state.position.size())
     return false;
 
-  return true; 
+  return true;
 }
 
 bool leatherman::getJointPositions(const sensor_msgs::JointState &state, std::vector<std::string> &names, std::vector<double> &positions)
@@ -617,7 +618,7 @@ bool leatherman::getJointPositions(const sensor_msgs::JointState &state, std::ve
         positions[j] = state.position[i];
         nind++;
         break;
-      } 
+      }
     }
     if(nind == names.size())
       break;
@@ -625,7 +626,7 @@ bool leatherman::getJointPositions(const sensor_msgs::JointState &state, std::ve
   if(nind != names.size())
     return false;
 
-  return true; 
+  return true;
 }
 
 void leatherman::findAndReplaceJointPosition(std::string name, double position, sensor_msgs::JointState &state)
@@ -637,7 +638,7 @@ void leatherman::findAndReplaceJointPosition(std::string name, double position, 
     {
       state.position[i] = position;
       exists = true;
-    }    
+    }
   }
   if(!exists)
   {
@@ -673,12 +674,12 @@ bool leatherman::getSegmentIndex(const KDL::Chain &c, std::string name, int &ind
 }
 
 bool leatherman::getSegmentOfJoint(const KDL::Tree &tree, std::string joint, std::string &segment)
-{ 
+{
   KDL::SegmentMap smap = tree.getSegments();
   for(std::map<std::string, KDL::TreeElement>::const_iterator iter = smap.begin(); iter != smap.end(); ++iter)
-  { 
+  {
     if(iter->second.segment.getJoint().getName().compare(joint) == 0)
-    { 
+    {
       segment = iter->second.segment.getName();
       return true;
     }
@@ -707,9 +708,9 @@ bool leatherman::getChainTip(const KDL::Tree &tree, const std::vector<std::strin
       if(leatherman::getSegmentIndex(chain, segments[j], index))
         num_segments_included++;
     }
-    
+
     if(num_segments_included == segments.size())
-    { 
+    {
       chain_tip = segments[i];
       return true;
     }
@@ -814,7 +815,7 @@ bool leatherman::getMeshComponentsFromResource(std::string resource, std::vector
 
   if(resource.empty())
     return false;
-  
+
   resource_retriever::Retriever retriever;
   resource_retriever::MemoryResource res;
   bool ok = true;
@@ -860,8 +861,8 @@ bool leatherman::getPose(const arm_navigation_msgs::MultiDOFJointState &state, s
 
   if(frame_id.compare(child_frame_id) == 0)
   {
-    pose.position.x = 0; 
-    pose.position.y = 0; 
+    pose.position.x = 0;
+    pose.position.y = 0;
     pose.position.z = 0;
     pose.orientation.w = 1;
     return true;
@@ -1090,7 +1091,7 @@ bool leatherman::getMeshComponentsFromResource(std::string resource, const geome
 
   if(resource.empty())
     return false;
- 
+
   mesh = shapes::createMeshFromResource(resource, s);
   if (mesh == NULL)
     ROS_ERROR("Failed to load mesh '%s'", resource.c_str());
@@ -1116,10 +1117,10 @@ void leatherman::scaleVertices(const std::vector<Eigen::Vector3d> &vin, double s
     sumy += vin[i].y();
     sumz += vin[i].z();
   }
-  mean(0) = sumx / double(vin.size()); 
+  mean(0) = sumx / double(vin.size());
   mean(1) = sumy / double(vin.size());
   mean(2) = sumz / double(vin.size());
-  
+
   //Eigen::Affine3d scale(Eigen::Translation3d(sx, sy, sz) * Eigen::Affine3d::Identity());
   //Eigen::Vector3d scale(sx, sy, sz);
 
@@ -1160,7 +1161,7 @@ double leatherman::getColladaFileScale(std::string resource)
 {
   static std::map<std::string, float> rescale_cache;
 
-  // Try to read unit to meter conversion ratio from mesh. Only valid in Collada XML formats. 
+  // Try to read unit to meter conversion ratio from mesh. Only valid in Collada XML formats.
   TiXmlDocument xmlDoc;
   float unit_scale(1.0);
   resource_retriever::Retriever retriever;
@@ -1318,7 +1319,7 @@ void leatherman::getInverse(const geometry_msgs::Pose &in, geometry_msgs::Pose &
   fin.p.z(in.position.z);
   fin.M = KDL::Rotation::Quaternion(in.orientation.x, in.orientation.y, in.orientation.z, in.orientation.w);
   fout = fin.Inverse();
-  msgFromPose(fout, out);  
+  msgFromPose(fout, out);
 }
 
 void leatherman::getInverse(const std::vector<double> &in, std::vector<double> &out)
