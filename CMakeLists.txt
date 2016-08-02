@@ -65,6 +65,7 @@ add_library(
     src/bresenham.cpp
     src/file.cpp
     src/print.cpp
+    src/profile.cpp
     src/stl.cpp
     src/utils.cpp 
     src/viz.cpp)
