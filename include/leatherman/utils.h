@@ -29,34 +29,15 @@
 
 namespace leatherman {
 
-/* Conversions */
-void poseVectorToPoseMsg(
-    const std::vector<double> &pose,
-    geometry_msgs::Pose &pose_msg);
-void poseMsgToPoseVector(
-    const geometry_msgs::Pose &pose,
-    std::vector<double> &posev);
-bool quatFromMsg(const geometry_msgs::Quaternion &qmsg, Eigen::Quaterniond &q);
-bool poseFromMsg(const geometry_msgs::Pose &tmsg, Eigen::Affine3d &t);
-void msgFromPose(const Eigen::Affine3d &t, geometry_msgs::Pose &tmsg);
-void msgFromPose(const Eigen::Affine3d &t, geometry_msgs::Transform &tmsg);
-void msgFromPose(const KDL::Frame &f, geometry_msgs::Pose &p);
-void quatMsgToRPY(const geometry_msgs::Quaternion &q, double &r, double &p, double &y);
-void rpyToQuatMsg(double r, double p, double y, geometry_msgs::Quaternion &q);
-void transformKDLToEigen(const KDL::Frame &k, Eigen::Affine3d &e);
-void transformEigenToKDL(const Eigen::Affine3d &e, KDL::Frame &k);
-void btTransformToPoseMsg(const tf::Transform &bt, geometry_msgs::Pose &pose);
-void poseMsgTobtTransform(const geometry_msgs::Pose &pose, tf::Transform &bt);
-void tfVector3ToEigen(const tf::Vector3 &bt, Eigen::Vector3d &e);
+void rpyToQuatMsg(double r, double p, double y, geometry_msgs::Quaternion& q);
 
-double getYaw(const geometry_msgs::Quaternion &q);
-void setRPY(double roll, double pitch, double yaw, Eigen::Matrix3d &m);
-void getRPY(const Eigen::Matrix3d &m, double &roll, double &pitch, double &yaw);
+void setRPY(double roll, double pitch, double yaw, Eigen::Matrix3d& m);
+void getRPY(const Eigen::Matrix3d& m, double& roll, double& pitch, double& yaw);
 void getRPY(
-    const geometry_msgs::Quaternion &qmsg,
-    double &roll, double &pitch, double &yaw);
+    const geometry_msgs::Quaternion& qmsg,
+    double& roll, double& pitch, double& yaw);
 void getRPY(
-    const std::vector<std::vector<double> > &Rot,
+    const std::vector<std::vector<double> >& Rot,
     double* roll, double* pitch, double* yaw,
     int solution_number);
 tf::Quaternion setRPY(
@@ -64,87 +45,47 @@ tf::Quaternion setRPY(
     const tfScalar& pitch,
     const tfScalar& yaw);
 
-/* Geometry */
-double distance(const KDL::Vector &a, const KDL::Vector &b);
-double distance(const Eigen::Vector3d &a, const Eigen::Vector3d &b);
-double distance(
-    double &x1,
-    double &y1,
-    double &z1,
-    double &x2,
-    double &y2,
-    double &z2);
-double distance(const std::vector<int> &a, const std::vector<int> &b);
 double distanceBetween3DLineSegments(
-    std::vector<int> l1a,
-    std::vector<int> l1b,
-    std::vector<int> l2a,
-    std::vector<int> l2b);
+    const Eigen::Vector3d& l1a, const Eigen::Vector3d& l1b,
+    const Eigen::Vector3d& l2a, const Eigen::Vector3d& l2b);
 void getIntermediatePoints(
-    Eigen::Vector3d a,
-    Eigen::Vector3d b,
+    const Eigen::Vector3d& a,
+    const Eigen::Vector3d& b,
     double d,
-    std::vector<Eigen::Vector3d> &points);
-void getIntermediatePoints(
-    KDL::Vector a,
-    KDL::Vector b,
-    double d,
-    std::vector<KDL::Vector> &points);
+    std::vector<Eigen::Vector3d>& points);
 bool getIntermediatePoints(
     trajectory_msgs::JointTrajectoryPoint a,
     trajectory_msgs::JointTrajectoryPoint b,
     int num_points,
-    std::vector<trajectory_msgs::JointTrajectoryPoint> &points);
+    std::vector<trajectory_msgs::JointTrajectoryPoint>& points);
 
 /* Meshes */
 shapes::Mesh* createMeshFromBinaryStl(const char *filename);
 shapes::Mesh* createMeshFromBinaryStlData(const char *data, unsigned int size);
 void getMeshComponents(
     shapes::Mesh* mesh,
-    std::vector<int> &triangles,
-    std::vector<geometry_msgs::Point> &vertices);
+    std::vector<int>& triangles,
+    std::vector<Eigen::Vector3d>& vertices);
 bool getMeshComponentsFromResource(
-    std::string resource,
-    std::vector<int32_t> &triangles,
-    std::vector<geometry_msgs::Point> &vertices);
-bool getMeshComponentsFromResource(
-    std::string resource,
-    const geometry_msgs::Vector3 &scale,
-    std::vector<int32_t> &triangles,
-    std::vector<geometry_msgs::Point> &vertices);
+    const std::string& resource,
+    const Eigen::Vector3d& scale,
+    std::vector<int>& triangles,
+    std::vector<Eigen::Vector3d>& vertices);
 void scaleVertices(
-    const std::vector<Eigen::Vector3d> &vin,
+    const std::vector<Eigen::Vector3d>& vin,
     double sx, double sy, double sz,
-    std::vector<Eigen::Vector3d> &vout);
+    std::vector<Eigen::Vector3d>& vout);
 void scaleVertices(
-    const std::vector<geometry_msgs::Point> &vin,
+    const std::vector<geometry_msgs::Point>& vin,
     double sx, double sy, double sz,
-    std::vector<geometry_msgs::Point> &vout);
+    std::vector<geometry_msgs::Point>& vout);
 double getColladaFileScale(std::string resource);
 bool getLinkMesh(
     std::string urdf,
     std::string name,
     bool collision,
-    std::string &mesh_resource,
-    geometry_msgs::PoseStamped &pose);
-
-/* Math */
-void multiplyPoses(
-    geometry_msgs::Pose &p1,
-    geometry_msgs::Pose &p2,
-    geometry_msgs::Pose &p);
-void multiply(
-    const geometry_msgs::Pose &a,
-    const geometry_msgs::Pose &b,
-    geometry_msgs::Pose &c);
-void comparePoses(
-    const std::vector<double> &a,
-    const std::vector<double> &b,
-    std::vector<double> &diff);
-void comparePosesAbsolute(
-    const std::vector<double> &a,
-    const std::vector<double> &b,
-    std::vector<double> &diff);
+    std::string& mesh_resource,
+    geometry_msgs::PoseStamped& pose);
 
 /* Search (string comparisons) */
 
@@ -152,9 +93,9 @@ void comparePosesAbsolute(
 bool isValidJointState(const sensor_msgs::JointState& state);
 
 bool findJointPosition(
-    const sensor_msgs::JointState &state,
+    const sensor_msgs::JointState& state,
     std::string name,
-    double &position);
+    double& position);
 
 /// \brief Extract a subset of joints from a joint state message.
 bool getJointPositions(
@@ -173,32 +114,27 @@ bool getJointPositions(
 void findAndReplaceJointPosition(
     std::string name,
     double position,
-    sensor_msgs::JointState &state);
+    sensor_msgs::JointState& state);
 
 bool getPose(
-    const sensor_msgs::MultiDOFJointState &state,
+    const sensor_msgs::MultiDOFJointState& state,
     std::string frame_id,
     std::string child_frame_id,
-    geometry_msgs::Pose &pose);
+    geometry_msgs::Pose& pose);
 
-bool getFrame(
-    const sensor_msgs::MultiDOFJointState &state,
-    std::string frame_id, std::string child_frame_id,
-    KDL::Frame &frame);
+bool getJointIndex(const KDL::Chain& c, std::string name, int& index);
 
-bool getJointIndex(const KDL::Chain &c, std::string name, int &index);
-
-bool getSegmentIndex(const KDL::Chain &c, std::string name, int &index);
+bool getSegmentIndex(const KDL::Chain& c, std::string name, int& index);
 
 bool getSegmentOfJoint(
-    const KDL::Tree &tree,
+    const KDL::Tree& tree,
     std::string joint,
-    std::string &segment);
+    std::string& segment);
 
 bool getChainTip(
-    const KDL::Tree &tree,
-    const std::vector<std::string> &segments,
-    std::string chain_root, std::string &chain_tip);
+    const KDL::Tree& tree,
+    const std::vector<std::string>& segments,
+    std::string chain_root, std::string& chain_tip);
 
 /* Joint Limits */
 bool getJointLimits(
@@ -215,9 +151,9 @@ bool getJointLimits(
     const std::string& root_name,
     const std::string& tip_name,
     const std::string& joint_name,
-    double &min_limit,
-    double &max_limit,
-    bool &continuous);
+    double& min_limit,
+    double& max_limit,
+    bool& continuous);
 
 /// \brief Convert an (H, S, V) color triplet to (R, G, B) format.
 /// \param h The hue in range [0, 360)
