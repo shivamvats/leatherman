@@ -120,6 +120,12 @@ visualization_msgs::MarkerArray getPosesMarkerArray(
     int id = 0,
     bool text = false);
 
+visualization_msgs::MarkerArray getFrameMarkerArray(
+    const Eigen::Affine3d& pose,
+    const std::string& frame_id,
+    const std::string& ns,
+    int id = 0);
+
 /* Spheres */
 visualization_msgs::Marker getSphereMarker(
     double x, double y, double z,

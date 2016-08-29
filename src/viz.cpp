@@ -272,6 +272,60 @@ visualization_msgs::MarkerArray getPosesMarkerArray(
     return ma;
 }
 
+visualization_msgs::MarkerArray getFrameMarkerArray(
+    const Eigen::Affine3d& pose,
+    const std::string& frame_id,
+    const std::string& ns,
+    int id)
+{
+    visualization_msgs::MarkerArray ma;
+
+    visualization_msgs::Marker m;
+
+    Eigen::Quaterniond q(pose.rotation());
+
+    m.header.frame_id = frame_id;
+    m.ns = ns;
+    m.id = id;
+    m.type = visualization_msgs::Marker::ARROW;
+    m.action = visualization_msgs::Marker::ADD;
+    m.pose.position.x = pose.translation()[0];
+    m.pose.position.y = pose.translation()[1];
+    m.pose.position.z = pose.translation()[2];
+    m.pose.orientation.w = q.w();
+    m.pose.orientation.x = q.x();
+    m.pose.orientation.y = q.y();
+    m.pose.orientation.z = q.z();
+    m.scale.x = 0.1;
+    m.scale.y = m.scale.z = 0.01;
+    m.color.r = m.color.a = 1.0;
+    m.color.g = m.color.b = 0.0;
+    m.lifetime = ros::Duration(0.0);
+    ma.markers.push_back(m);
+
+    q = q * Eigen::AngleAxisd(M_PI / 2.0, Eigen::Vector3d::UnitZ());
+    ++m.id;
+    m.pose.orientation.w = q.w();
+    m.pose.orientation.x = q.x();
+    m.pose.orientation.y = q.y();
+    m.pose.orientation.z = q.z();
+    m.color.r = 0.0;
+    m.color.g = 1.0;
+    ma.markers.push_back(m);
+
+    q = q * Eigen::AngleAxisd(-M_PI / 2.0, Eigen::Vector3d::UnitY());
+    ++m.id;
+    m.pose.orientation.w = q.w();
+    m.pose.orientation.x = q.x();
+    m.pose.orientation.y = q.y();
+    m.pose.orientation.z = q.z();
+    m.color.g = 0.0;
+    m.color.b = 1.0;
+    ma.markers.push_back(m);
+
+    return ma;
+}
+
 visualization_msgs::MarkerArray getPoseMarkerArray(
     const geometry_msgs::Pose& pose,
     const std::string& frame_id,
@@ -467,6 +521,7 @@ visualization_msgs::MarkerArray getSpheresMarkerArray(
         marker.pose.position.x = pose[i][0];
         marker.pose.position.y = pose[i][1];
         marker.pose.position.z = pose[i][2];
+        marker.pose.orientation.w = 1.0;
         marker_array.markers.push_back(marker);
     }
     return marker_array;
