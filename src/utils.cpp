@@ -534,6 +534,25 @@ void leatherman::HSVtoRGB(
     }
 }
 
+void leatherman::msgRGBToHSV(
+    const std_msgs::ColorRGBA& color,
+    double& h, double& s, double& v)
+{
+    // TODO: implement
+}
+
+void leatherman::msgHSVToRGB(
+    double h, double s, double v,
+    std_msgs::ColorRGBA& color)
+{
+    double r, g, b;
+    leatherman::HSVtoRGB(&r, &g, &b, h, s, v);
+    color.r = r;
+    color.g = g;
+    color.b = b;
+    color.a = 1.0f;
+}
+
 void leatherman::setLoggerLevel(std::string package, std::string name, std::string level)
 {
   ROSCONSOLE_AUTOINIT;

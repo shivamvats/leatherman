@@ -20,6 +20,7 @@
 #include <ros/console.h>
 #include <sensor_msgs/JointState.h>
 #include <sensor_msgs/MultiDOFJointState.h>
+#include <std_msgs/ColorRGBA.h>
 #include <tf/LinearMath/Scalar.h>
 #include <tf/LinearMath/Transform.h>
 #include <tf/LinearMath/Vector3.h>
@@ -160,6 +161,8 @@ bool getJointLimits(
 /// \param s The saturation in range [0, 1]
 /// \param v The value in range [0, 1]
 void HSVtoRGB(double* r, double* g, double* b, double h, double s, double v);
+void msgRGBToHSV(const std_msgs::ColorRGBA& color, double& h, double& s, double& v);
+void msgHSVToRGB(double h, double s, double v, std_msgs::ColorRGBA& color);
 
 /* ROS Logging */
 void setLoggerLevel(std::string package, std::string name, std::string level);
