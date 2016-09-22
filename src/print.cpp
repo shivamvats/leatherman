@@ -162,3 +162,62 @@ std::string leatherman::getString(
     }
     return ss.str();
 }
+
+namespace Eigen {
+
+std::string to_str(const Affine3d& transform)
+{
+    const Vector3d translation(transform.translation());
+    const Quaterniond rotation(transform.rotation());
+    std::stringstream ss;
+    ss << "pos: (" << translation.x() << ", " << translation.y() << ", " << translation.z() << ")";
+    ss << " ";
+    ss << "rot: (" << rotation.w() << ", " << rotation.x() << ", " << rotation.y() << ", " << rotation.z() << ")";
+    return ss.str();
+}
+
+std::string to_str(const Vector2d& v)
+{
+    std::stringstream ss;
+    ss << "(" << v(0) << ", " << v(1) << ")";
+    return ss.str();
+}
+
+std::string to_str(const Vector3d& v)
+{
+    std::stringstream ss;
+    ss << "(" << v(0) << ", " << v(1) << ", " << v(2) << ")";
+    return ss.str();
+}
+
+std::string to_str(const AngleAxisd& aa)
+{
+    std::stringstream ss;
+    ss << "{ angle: " << 180.0 * aa.angle() / M_PI << " degs @ " << to_str(aa.axis()) << " }";
+    return ss.str();
+}
+
+} // namespace Eigen
+
+namespace geometry_msgs {
+
+std::string to_string(const geometry_msgs::Transform& t)
+{
+    std::stringstream ss;
+    ss << "{ " <<
+            "translation: " <<
+            "{ " <<
+            "x: " << t.translation.x << ", " <<
+            "y: " << t.translation.y << ", " <<
+            "z: " << t.translation.z << " " <<
+            "}, " <<
+            "rotation: " <<
+            "{ " <<
+            "x: " << t.rotation.x << ", " <<
+            "y: " << t.rotation.y << ", " <<
+            "z: " << t.rotation.z << ", " <<
+            "w: " << t.rotation.w << " ";
+    return ss.str();
+}
+
+} // namespace geometry_msgs

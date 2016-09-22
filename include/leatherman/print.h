@@ -9,6 +9,7 @@
 #include <vector>
 #include <string>
 #include <geometry_msgs/PoseStamped.h>
+#include <geometry_msgs/Transform.h>
 #include <trajectory_msgs/JointTrajectory.h>
 #include <Eigen/Core>
 #include <Eigen/Geometry>
@@ -96,5 +97,20 @@ string to_string(const vector<T, Allocator>& v)
 }
 
 } // namespace std
+
+namespace Eigen {
+
+std::string to_str(const Affine3d& transform);
+std::string to_str(const Vector2d& v);
+std::string to_str(const Vector3d& v);
+std::string to_str(const AngleAxisd& aa);
+
+} // namespace Eigen
+
+namespace geometry_msgs {
+
+std::string to_string(const geometry_msgs::Transform& t);
+
+} // namespace geometry_msgs
 
 #endif
