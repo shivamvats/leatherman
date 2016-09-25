@@ -424,6 +424,7 @@ visualization_msgs::Marker getSphereMarker(
     marker.pose.position.x = x;
     marker.pose.position.y = y;
     marker.pose.position.z = z;
+    marker.pose.orientation.w = 1.0;
     marker.scale.x = radius * 2.0f;
     marker.scale.y = radius * 2.0f;
     marker.scale.z = radius * 2.0f;
