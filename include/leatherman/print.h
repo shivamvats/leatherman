@@ -109,7 +109,7 @@ std::string to_str(const AngleAxisd& aa);
 
 namespace geometry_msgs {
 
-std::string to_string(const geometry_msgs::Transform& t);
+std::string to_string(const Transform& t);
 
 } // namespace geometry_msgs
 
