@@ -34,37 +34,44 @@
 #include <iostream>
 #include <math.h>
 
-namespace leatherman
+namespace leatherman {
+
+struct CELL3V
 {
+    int x;
+    int y;
+    int z;
+    bool bIsObstacle;
+};
 
-typedef struct
+struct bresenham3d_param_t
 {
-  int x;
-  int y;
-  int z;
-  bool bIsObstacle;
-} CELL3V;
+    int X1, Y1, Z1;
+    int X2, Y2, Z2;
+    int XIndex, YIndex, ZIndex;
+    int UsingXYZIndex;
+    int IncX, IncY, IncZ;
+    int dx, dy, dz;
+    int dx2, dy2, dz2;
+    int err1, err2;
+};
 
-typedef struct 
-{
-  int X1, Y1, Z1;
-  int X2, Y2, Z2;
-  int XIndex, YIndex, ZIndex;
-  int UsingXYZIndex;
-  int IncX, IncY, IncZ;
-  int dx, dy, dz;
-  int dx2, dy2, dz2;
-  int err1, err2;
-} bresenham3d_param_t;
+void get_bresenham3d_parameters(
+    int p1x, int p1y, int p1z,
+    int p2x, int p2y, int p2z,
+    bresenham3d_param_t *params);
 
-void get_bresenham3d_parameters(int p1x, int p1y, int p1z, int p2x, int p2y, int p2z, bresenham3d_param_t *params);
-
-void get_current_point3d(bresenham3d_param_t *params, int *x, int *y, int *z);
+void get_current_point3d(
+    bresenham3d_param_t *params,
+    int *x, int *y, int *z);
 
 int get_next_point3d(bresenham3d_param_t *params);
 
-void getLineSegment(const std::vector<int> a,const std::vector<int> b,std::vector<std::vector<int> > &points);
+void getLineSegment(
+    const std::vector<int> a,
+    const std::vector<int> b,
+    std::vector<std::vector<int> > &points);
 
-};
+} // namespace leatherman
 
 #endif
