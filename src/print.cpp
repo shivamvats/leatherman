@@ -201,6 +201,25 @@ std::string to_str(const AngleAxisd& aa)
 
 namespace geometry_msgs {
 
+std::string to_string(const Pose& p)
+{
+    std::stringstream ss;
+    ss << "{ " <<
+            "position: " <<
+            "{ " <<
+            "x: " << p.position.x << ", " <<
+            "y: " << p.position.y << ", " <<
+            "z: " << p.position.z << " " <<
+            "}, " <<
+            "orientation: " <<
+            "{ " <<
+            "w: " << p.orientation.w << ", " <<
+            "x: " << p.orientation.x << ", " <<
+            "y: " << p.orientation.y << ", " <<
+            "z: " << p.orientation.z << " ";
+    return ss.str();
+}
+
 std::string to_string(const geometry_msgs::Transform& t)
 {
     std::stringstream ss;
@@ -216,7 +235,8 @@ std::string to_string(const geometry_msgs::Transform& t)
             "x: " << t.rotation.x << ", " <<
             "y: " << t.rotation.y << ", " <<
             "z: " << t.rotation.z << ", " <<
-            "w: " << t.rotation.w << " ";
+            "w: " << t.rotation.w << " " <<
+            "} }";
     return ss.str();
 }
 
