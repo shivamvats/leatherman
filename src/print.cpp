@@ -1,6 +1,8 @@
 #include <leatherman/print.h>
 
-void leatherman::printPoseMsg(
+namespace leatherman {
+
+void printPoseMsg(
     const geometry_msgs::Pose& p,
     const std::string& text)
 {
@@ -9,25 +11,7 @@ void leatherman::printPoseMsg(
             p.orientation.x, p.orientation.y, p.orientation.z, p.orientation.w);
 }
 
-void leatherman::printPoseStampedMsg(
-    const geometry_msgs::PoseStamped& p,
-    const std::string& text)
-{
-    ROS_INFO("[%s] xyz: %0.3f %0.3f %0.3f  quat: %0.3f %0.3f %0.3f %0.3f  time: % 0.3f",
-            text.c_str(), p.pose.position.x, p.pose.position.y,
-            p.pose.position.z, p.pose.orientation.x, p.pose.orientation.y,
-            p.pose.orientation.z, p.pose.orientation.w, p.header.stamp.toSec());
-}
-
-void leatherman::printPose(
-    const std::vector<double>& p,
-    const std::string& text)
-{
-    ROS_INFO("[%s] xyz: % 0.3f % 0.3f % 0.3f  rpy: % 0.3f % 0.3f % 0.3f",
-            text.c_str(), p[0], p[1], p[2], p[3], p[4], p[5]);
-}
-
-void leatherman::printJointTrajectory(
+void printJointTrajectory(
     const trajectory_msgs::JointTrajectory& traj,
     const std::string& text)
 {
@@ -41,79 +25,7 @@ void leatherman::printJointTrajectory(
     }
 }
 
-void leatherman::printJointTrajectoryPoints(
-    const std::vector<trajectory_msgs::JointTrajectoryPoint>& points,
-    const std::string& text)
-{
-    for (unsigned int i = 0; i < points.size(); i++) {
-        ROS_INFO_STREAM("[" << text << "] [" << i << "] " <<
-                points[i].positions <<
-                " time from start: " << points[i].time_from_start.toSec());
-    }
-}
-void leatherman::printCompleteJointTrajectory(
-    const trajectory_msgs::JointTrajectory& traj,
-    const std::string& name)
-{
-    for (size_t i = 0; i < traj.points.size(); ++i) {
-        printf("[%d] time_from_start: %1.4f\n", int(i), traj.points[i].time_from_start.toSec());
-        // positions
-        if (traj.points[i].positions.size() > 0) {
-            printf("       positions: ");
-            for (size_t j = 0; j < traj.points[i].positions.size(); ++j) {
-                printf("%1.2f, ", traj.points[i].positions[j]);
-            }
-            printf("\n");
-        }
-        // velocities
-        if (traj.points[i].velocities.size() > 0) {
-            printf("      velocities: ");
-            for (size_t j = 0; j < traj.points[i].velocities.size(); ++j) {
-                printf("%1.2f, ", traj.points[i].velocities[j]);
-            }
-            printf("\n");
-        }
-        // accelerations
-        if (traj.points[i].accelerations.size() > 0) {
-            printf("   accelerations: ");
-            for (size_t j = 0; j < traj.points[i].accelerations.size(); ++j) {
-                printf("%1.2f, ", traj.points[i].accelerations[j]);
-            }
-            printf("\n");
-        }
-    }
-}
-
-void leatherman::printAffine3d(
-    const Eigen::Affine3d& a,
-    const std::string& text)
-{
-    ROS_INFO("[%s] xyz: %0.3f %0.3f %0.3f", text.c_str(), a.translation().x(), a.translation().y(), a.translation().z());
-}
-
-void leatherman::printKDLFrame(const KDL::Frame& f, const std::string& text)
-{
-    double r, p, y;
-    f.M.GetRPY(r, p, y);
-    ROS_INFO("[%s] xyz: %0.3f %0.3f %0.3f  rpy: %0.3f %0.3f %0.3f", text.c_str(), f.p[0], f.p[1], f.p[2], r, p, y);
-}
-
-void leatherman::printKDLFrames(
-    const std::vector<std::vector<KDL::Frame>>& f,
-    const std::string& text)
-{
-    double r, p, y;
-    for (size_t i = 0; i < f.size(); ++i) {
-        for (size_t j = 0; j < f[i].size(); ++j) {
-            f[i][j].M.GetRPY(r, p, y);
-            ROS_INFO("[%s] [%d %d]  xyz: %0.3f %0.3f %0.3f  rpy: %0.3f %0.3f %0.3f",
-                    text.c_str(), int(i), int(j), f[i][j].p.x(), f[i][j].p.y(),
-                    f[i][j].p.z(), r, p, y);
-        }
-    }
-}
-
-void leatherman::printKDLChain(const KDL::Chain& c, const std::string& text)
+void printKDLChain(const KDL::Chain& c, const std::string& text)
 {
     ROS_INFO("[%s] # segments: %d  # joints: %d", text.c_str(),
             c.getNrOfSegments(), c.getNrOfJoints());
@@ -137,31 +49,7 @@ void leatherman::printKDLChain(const KDL::Chain& c, const std::string& text)
     }
 }
 
-std::string leatherman::getString(const std::vector<double>& v, int precision)
-{
-    std::stringstream ss;
-    for (std::size_t j = 0; j < v.size(); ++j) {
-        ss << std::fixed << std::setw(precision) << std::setprecision(precision) << std::showpoint << v[j] << " ";
-    }
-    return ss.str();
-}
-
-std::string leatherman::getString(
-    const std::vector<bool>& v,
-    const std::string& t,
-    const std::string& f)
-{
-    std::stringstream ss;
-    for (std::size_t j = 0; j < v.size(); ++j) {
-        if (v[j]) {
-            ss << t << " ";
-        }
-        else {
-            ss << f << " ";
-        }
-    }
-    return ss.str();
-}
+} // namespace leatherman
 
 namespace Eigen {
 

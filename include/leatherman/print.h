@@ -1,74 +1,33 @@
 #ifndef _LEATHERMAN_PRINT_
 #define _LEATHERMAN_PRINT_
 
+// standard includes
 #include <cstdarg>
 #include <cstdio>
 #include <cstring>
 #include <sstream>
-#include <ros/console.h>
-#include <vector>
 #include <string>
-#include <geometry_msgs/PoseStamped.h>
-#include <geometry_msgs/Transform.h>
-#include <trajectory_msgs/JointTrajectory.h>
+#include <vector>
+
+// system includes
 #include <Eigen/Core>
 #include <Eigen/Geometry>
-#include <kdl/frames.hpp>
+#include <geometry_msgs/PoseStamped.h>
+#include <geometry_msgs/Transform.h>
 #include <kdl/chain.hpp>
+#include <kdl/frames.hpp>
+#include <ros/console.h>
+#include <trajectory_msgs/JointTrajectory.h>
 
 namespace leatherman {
 
-void printPose(const std::vector<double>& p, const std::string& text);
-
 void printPoseMsg(const geometry_msgs::Pose& p, const std::string& text);
-
-void printPoseStampedMsg(
-    const geometry_msgs::PoseStamped& p,
-    const std::string& text);
 
 void printJointTrajectory(
     const trajectory_msgs::JointTrajectory& traj,
     const std::string& text);
 
-void printJointTrajectoryPoints(
-    const std::vector<trajectory_msgs::JointTrajectoryPoint>& points,
-    const std::string& text);
-
-void printCompleteJointTrajectory(
-    const trajectory_msgs::JointTrajectory& traj,
-    const std::string& name);
-
-void printAffine3d(const Eigen::Affine3d& a, const std::string& text);
-
-void printKDLFrame(const KDL::Frame& f, const std::string& text);
-
-void printKDLFrames(
-    const std::vector<std::vector<KDL::Frame>>& f,
-    const std::string& text);
-
 void printKDLChain(const KDL::Chain& c, const std::string& text);
-
-std::string getString(const std::vector<double>& v, int precision = 3);
-
-std::string getString(
-    const std::vector<bool>& v,
-    const std::string& t,
-    const std::string& f);
-
-template <typename T>
-std::string vectorToString(const std::vector<T>& v)
-{
-    std::stringstream ss;
-    ss << "[ ";
-    for (size_t i = 0; i < v.size(); ++i) {
-        ss << v[i];
-        if (i != v.size() - 1) {
-            ss << ", ";
-        }
-    }
-    ss << "]";
-    return ss.str();
-}
 
 } // namespace leatherman
 
