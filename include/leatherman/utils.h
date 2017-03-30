@@ -30,14 +30,6 @@
 
 namespace leatherman {
 
-void getRPY(
-    const geometry_msgs::Quaternion& qmsg,
-    double& roll, double& pitch, double& yaw);
-void getRPY(
-    const std::vector<std::vector<double> >& Rot,
-    double* roll, double* pitch, double* yaw,
-    int solution_number);
-
 ////////////////////////
 // Geometry Utilities //
 ////////////////////////
@@ -45,37 +37,6 @@ void getRPY(
 double distanceBetween3DLineSegments(
     const Eigen::Vector3d& l1a, const Eigen::Vector3d& l1b,
     const Eigen::Vector3d& l2a, const Eigen::Vector3d& l2b);
-
-////////////////////
-// Mesh Utilities //
-////////////////////
-
-shapes::Mesh* createMeshFromBinaryStl(const char *filename);
-shapes::Mesh* createMeshFromBinaryStlData(const char *data, unsigned int size);
-void getMeshComponents(
-    shapes::Mesh* mesh,
-    std::vector<int>& triangles,
-    std::vector<Eigen::Vector3d>& vertices);
-bool getMeshComponentsFromResource(
-    const std::string& resource,
-    const Eigen::Vector3d& scale,
-    std::vector<int>& triangles,
-    std::vector<Eigen::Vector3d>& vertices);
-void scaleVertices(
-    const std::vector<Eigen::Vector3d>& vin,
-    double sx, double sy, double sz,
-    std::vector<Eigen::Vector3d>& vout);
-void scaleVertices(
-    const std::vector<geometry_msgs::Point>& vin,
-    double sx, double sy, double sz,
-    std::vector<geometry_msgs::Point>& vout);
-double getColladaFileScale(std::string resource);
-bool getLinkMesh(
-    std::string urdf,
-    std::string name,
-    bool collision,
-    std::string& mesh_resource,
-    geometry_msgs::PoseStamped& pose);
 
 ///////////////////////////
 // Joint State Utilities //

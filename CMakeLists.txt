@@ -64,6 +64,8 @@ add_library(
     src/binvox.cpp
     src/bresenham.cpp
     src/file.cpp
+    src/mesh_processing.cpp
+    src/mesh_resource.cpp
     src/print.cpp
     src/profile.cpp
     src/stl.cpp
