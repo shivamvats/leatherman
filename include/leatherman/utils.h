@@ -92,6 +92,7 @@ bool getLinkMesh(
 
 
 bool isValidJointState(const sensor_msgs::JointState& state);
+bool isValidMultiDOFJointState(const sensor_msgs::MultiDOFJointState& state);
 
 bool findJointPosition(
     const sensor_msgs::JointState& state,
@@ -101,6 +102,7 @@ bool findJointPosition(
 /// \brief Extract a subset of joints from a joint state message.
 bool getJointPositions(
     const sensor_msgs::JointState& joint_state,
+    const sensor_msgs::MultiDOFJointState& multi_dof_joint_state,
     const std::vector<std::string>& joint_names,
     std::vector<double>& positions);
 
@@ -108,6 +110,7 @@ bool getJointPositions(
 ///     missing joints.
 bool getJointPositions(
     const sensor_msgs::JointState& joint_state,
+    const sensor_msgs::MultiDOFJointState& multi_dof_joint_state,
     const std::vector<std::string>& joint_names,
     std::vector<double>& positions,
     std::vector<std::string>& missing);

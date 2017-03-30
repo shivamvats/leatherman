@@ -321,6 +321,13 @@ bool leatherman::isValidJointState(const sensor_msgs::JointState& state)
             (state.effort.empty() || state.effort.size() == state.name.size());
 }
 
+bool leatherman::isValidMultiDOFJointState(const sensor_msgs::MultiDOFJointState& state)
+{
+    return (state.transforms.empty() || state.transforms.size() == state.joint_names.size()) ||
+            (state.twist.empty() || state.twist.size() == state.joint_names.size()) ||
+            (state.wrench.empty() || state.wrench.size() == state.joint_names.size());
+}
+
 bool leatherman::findJointPosition(const sensor_msgs::JointState &state, std::string name, double &position)
 {
   for(size_t i = 0; i < state.name.size(); i++)
@@ -336,53 +343,115 @@ bool leatherman::findJointPosition(const sensor_msgs::JointState &state, std::st
 
 bool leatherman::getJointPositions(
     const sensor_msgs::JointState& joint_state,
+    const sensor_msgs::MultiDOFJointState& multi_dof_joint_state,
     const std::vector<std::string>& joint_names,
     std::vector<double>& positions)
 {
-    if (!isValidJointState(joint_state)) {
-        return false;
-    }
-
-    positions.resize(joint_names.size());
-
-    for (size_t nind = 0; nind < joint_names.size(); ++nind) {
-        const std::string& joint_name = joint_names[nind];
-        auto it = std::find(joint_state.name.begin(), joint_state.name.end(), joint_name);
-        if (it == joint_state.name.end()) {
-            positions.clear();
-            return false;
-        }
-        else {
-            size_t jind = std::distance(joint_state.name.begin(), it);
-            positions[nind] = joint_state.position[nind];
-        }
-    }
-
-    return true;
+    std::vector<std::string> missing;
+    return getJointPositions(
+            joint_state,
+            multi_dof_joint_state,
+            joint_names,
+            positions,
+            missing);
 }
 
 bool leatherman::getJointPositions(
     const sensor_msgs::JointState& joint_state,
+    const sensor_msgs::MultiDOFJointState& multi_dof_joint_state,
     const std::vector<std::string>& joint_names,
     std::vector<double>& positions,
     std::vector<std::string>& missing)
 {
-    if (!isValidJointState(joint_state)) {
+    if (!isValidJointState(joint_state) ||
+        !isValidMultiDOFJointState(multi_dof_joint_state))
+    {
         return false;
     }
 
     positions.resize(joint_names.size());
     missing.clear();
 
-    for (size_t nind = 0; nind < joint_names.size(); ++nind) {
-        const std::string& joint_name = joint_names[nind];
-        auto it = std::find(joint_state.name.begin(), joint_state.name.end(), joint_name);
-        if (it == joint_state.name.end()) {
-            missing.push_back(joint_name);
-        }
-        else {
-            size_t jind = std::distance(joint_state.name.begin(), it);
-            positions[nind] = joint_state.position[jind];
+    for (size_t jidx = 0; jidx < joint_names.size(); ++jidx) {
+        const std::string& joint_name = joint_names[jidx];
+        const size_t idx = joint_name.find('/');
+        if (idx != std::string::npos) {
+            std::string jname = joint_name.substr(0, idx);
+            std::string local_var_name = joint_name.substr(idx + 1);
+            auto it = std::find(
+                    multi_dof_joint_state.joint_names.begin(),
+                    multi_dof_joint_state.joint_names.end(),
+                    jname);
+            if (it == multi_dof_joint_state.joint_names.end()) {
+                missing.push_back(joint_name);
+            } else {
+                size_t jind = std::distance(multi_dof_joint_state.joint_names.begin(), it);
+                const auto& trans = multi_dof_joint_state.transforms[jind];
+                if (local_var_name == "x" || local_var_name == "trans_x") {
+                    positions[jidx] = trans.translation.x;
+                } else if (local_var_name == "y" || local_var_name == "trans_y") {
+                    positions[jidx] = trans.translation.y;
+                } else if (local_var_name == "z" || local_var_name == "trans_z") {
+                    positions[jidx] = trans.translation.z;
+                } else if (local_var_name == "theta") {
+                    double theta;
+
+                    Eigen::Quaterniond q(
+                            trans.rotation.w,
+                            trans.rotation.x,
+                            trans.rotation.y,
+                            trans.rotation.z);
+                    double s_squared = 1.0 - (q.w() * q.w());
+                    // from sbpl_collision_checking, from MoveIt, from BULLET
+                    if (s_squared < 10.0 * std::numeric_limits<double>::epsilon()) {
+                        theta = 0.0;
+                    } else {
+                        double s = 1.0 / sqrt(s_squared);
+                        theta = (acos(q.w()) * 2.0f) * (q.z() * s);
+                    }
+                    positions[jidx] = theta;
+                } else if (local_var_name == "rot_w") {
+                    Eigen::Quaterniond q(
+                            trans.rotation.w,
+                            trans.rotation.x,
+                            trans.rotation.y,
+                            trans.rotation.z);
+                    positions[jidx] = q.w();
+                } else if (local_var_name == "rot_x") {
+                    Eigen::Quaterniond q(
+                            trans.rotation.w,
+                            trans.rotation.x,
+                            trans.rotation.y,
+                            trans.rotation.z);
+                    positions[jidx] = q.x();
+                } else if (local_var_name == "rot_y") {
+                    Eigen::Quaterniond q(
+                            trans.rotation.w,
+                            trans.rotation.x,
+                            trans.rotation.y,
+                            trans.rotation.z);
+                    positions[jidx] = q.y();
+                } else if (local_var_name == "rot_z") {
+                    Eigen::Quaterniond q(
+                            trans.rotation.w,
+                            trans.rotation.x,
+                            trans.rotation.y,
+                            trans.rotation.z);
+                    positions[jidx] = q.z();
+                } else {
+                    ROS_ERROR("Unrecognized local variable name '%s'", local_var_name.c_str());
+                    return false;
+                }
+            }
+        } else {
+            auto it = std::find(joint_state.name.begin(), joint_state.name.end(), joint_name);
+            if (it == joint_state.name.end()) {
+                missing.push_back(joint_name);
+            }
+            else {
+                size_t jind = std::distance(joint_state.name.begin(), it);
+                positions[jidx] = joint_state.position[jind];
+            }
         }
     }
 
