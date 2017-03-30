@@ -8,7 +8,9 @@
 
 #define SMALL_NUM  0.00000001     // to avoid division overflow
 
-double leatherman::distanceBetween3DLineSegments(
+namespace leatherman {
+
+double distanceBetween3DLineSegments(
     const Eigen::Vector3d& l1a,
     const Eigen::Vector3d& l1b,
     const Eigen::Vector3d& l2a,
@@ -113,7 +115,7 @@ double leatherman::distanceBetween3DLineSegments(
  * Written by Ioan Sucan */
 
 /*
-shapes::Mesh* leatherman::createMeshFromBinaryStlData(const char *data, unsigned int size)
+shapes::Mesh* createMeshFromBinaryStlData(const char *data, unsigned int size)
 {
   const char* pos = data;
   pos += 80; // skip the 80 byte header
@@ -171,7 +173,7 @@ shapes::Mesh* leatherman::createMeshFromBinaryStlData(const char *data, unsigned
   return NULL;
 }
 
-shapes::Mesh* leatherman::createMeshFromBinaryStl(const char *filename)
+shapes::Mesh* createMeshFromBinaryStl(const char *filename)
 {
   FILE* input = fopen(filename, "r");
   if (!input)
@@ -197,7 +199,7 @@ shapes::Mesh* leatherman::createMeshFromBinaryStl(const char *filename)
 }
 */
 
-void leatherman::getMeshComponents(
+void getMeshComponents(
     shapes::Mesh* mesh,
     std::vector<int>& triangles,
     std::vector<Eigen::Vector3d>& vertices)
@@ -221,14 +223,7 @@ void leatherman::getMeshComponents(
     }
 }
 
-void leatherman::rpyToQuatMsg(double r, double p, double y, geometry_msgs::Quaternion &q)
-{
-  tf::Quaternion btpose;
-  btpose = setRPY(r, p, y);
-  tf::quaternionTFToMsg(btpose, q);
-}
-
-void leatherman::getRPY(const geometry_msgs::Quaternion &qmsg, double &roll, double &pitch, double &yaw)
+void getRPY(const geometry_msgs::Quaternion &qmsg, double &roll, double &pitch, double &yaw)
 {
   geometry_msgs::Pose pose;
   pose.orientation = qmsg;
@@ -238,97 +233,21 @@ void leatherman::getRPY(const geometry_msgs::Quaternion &qmsg, double &roll, dou
   ROS_DEBUG("[utils] rpy: %0.3f %0.3f %0.3f  quat: %0.3f %0.3f %0.3f %0.3f\n", roll, pitch, yaw, qmsg.x, qmsg.y, qmsg.z, qmsg.w);fflush(stdout);
 }
 
-bool leatherman::getIntermediatePoints(trajectory_msgs::JointTrajectoryPoint a, trajectory_msgs::JointTrajectoryPoint b, int num_points, std::vector<trajectory_msgs::JointTrajectoryPoint> &points)
-{
-  if(a.positions.size() != b.positions.size())
-    return false;
-
-  double time_inc = (b.time_from_start - a.time_from_start).toSec() / (num_points+1);
-  std::vector<double> inc(a.positions.size(),0);
-  for(size_t i = 0; i < a.positions.size(); ++i)
-    inc[i] = angles::shortest_angular_distance(a.positions[i], b.positions[i]) / (num_points+1);
-
-
-  points.resize(num_points);
-  for(int i = 0; i < num_points; ++i)
-  {
-    points[i].positions.resize(a.positions.size());
-    for(size_t j = 0; j < a.positions.size(); ++j)
-      points[i].positions[j] = a.positions[j] + (i+1)*inc[j];
-    points[i].time_from_start = a.time_from_start + ros::Duration((i+1)*(time_inc));
-  }
-  return true;
-}
-
-tf::Quaternion leatherman::setRPY(const tfScalar& roll, const tfScalar& pitch, const tfScalar& yaw)
-{
-  tfScalar halfYaw = tfScalar(yaw) * tfScalar(0.5);
-  tfScalar halfPitch = tfScalar(pitch) * tfScalar(0.5);
-  tfScalar halfRoll = tfScalar(roll) * tfScalar(0.5);
-  tfScalar cosYaw = tfCos(halfYaw);
-  tfScalar sinYaw = tfSin(halfYaw);
-  tfScalar cosPitch = tfCos(halfPitch);
-  tfScalar sinPitch = tfSin(halfPitch);
-  tfScalar cosRoll = tfCos(halfRoll);
-  tfScalar sinRoll = tfSin(halfRoll);
-  tf::Quaternion q;
-  q.setValue(sinRoll * cosPitch * cosYaw - cosRoll * sinPitch * sinYaw, //x
-      cosRoll * sinPitch * cosYaw + sinRoll * cosPitch * sinYaw, //y
-      cosRoll * cosPitch * sinYaw - sinRoll * sinPitch * cosYaw, //z
-      cosRoll * cosPitch * cosYaw + sinRoll * sinPitch * sinYaw); //formerly yzx
-
-  return q;
-}
-
-void leatherman::setRPY(double roll, double pitch, double yaw, Eigen::Matrix3d &m)
-{
-  m = Eigen::AngleAxisd(roll, Eigen::Vector3d::UnitX()) * Eigen::AngleAxisd(pitch, Eigen::Vector3d::UnitY()) * Eigen::AngleAxisd(yaw, Eigen::Vector3d::UnitZ());
-}
-
-void leatherman::getRPY(const Eigen::Matrix3d &m, double &roll, double &pitch, double &yaw)
-{
-  Eigen::Vector3d v = m.eulerAngles(0,1,2);
-  roll = v(0);  pitch = v(1);  yaw = v(2);
-}
-
-void leatherman::getIntermediatePoints(
-    const Eigen::Vector3d& a,
-    const Eigen::Vector3d& b,
-    double d,
-    std::vector<Eigen::Vector3d>& points)
-{
-  Eigen::Vector3d pt, dir;
-  int interm_points = floor((a - b).norm() / d + 0.5);
-
-  dir = b - a;
-  dir.normalize();
-  ROS_DEBUG("# interm points: %d  unit vector: %0.3f %0.3f %0.3f", interm_points, dir(0), dir(1), dir(2));
-
-  points.clear();
-  points.push_back(a);
-  for(int i = 1; i <= interm_points; ++i)
-  {
-    pt = a + dir*i*d;
-    points.push_back(pt);
-  }
-  points.push_back(b);
-}
-
-bool leatherman::isValidJointState(const sensor_msgs::JointState& state)
+bool isValidJointState(const sensor_msgs::JointState& state)
 {
     return (state.position.empty() || state.position.size() == state.name.size()) ||
             (state.velocity.empty() || state.velocity.size() == state.name.size()) ||
             (state.effort.empty() || state.effort.size() == state.name.size());
 }
 
-bool leatherman::isValidMultiDOFJointState(const sensor_msgs::MultiDOFJointState& state)
+bool isValidMultiDOFJointState(const sensor_msgs::MultiDOFJointState& state)
 {
     return (state.transforms.empty() || state.transforms.size() == state.joint_names.size()) ||
             (state.twist.empty() || state.twist.size() == state.joint_names.size()) ||
             (state.wrench.empty() || state.wrench.size() == state.joint_names.size());
 }
 
-bool leatherman::findJointPosition(const sensor_msgs::JointState &state, std::string name, double &position)
+bool findJointPosition(const sensor_msgs::JointState &state, std::string name, double &position)
 {
   for(size_t i = 0; i < state.name.size(); i++)
   {
@@ -341,7 +260,7 @@ bool leatherman::findJointPosition(const sensor_msgs::JointState &state, std::st
   return false;
 }
 
-bool leatherman::getJointPositions(
+bool getJointPositions(
     const sensor_msgs::JointState& joint_state,
     const sensor_msgs::MultiDOFJointState& multi_dof_joint_state,
     const std::vector<std::string>& joint_names,
@@ -356,7 +275,7 @@ bool leatherman::getJointPositions(
             missing);
 }
 
-bool leatherman::getJointPositions(
+bool getJointPositions(
     const sensor_msgs::JointState& joint_state,
     const sensor_msgs::MultiDOFJointState& multi_dof_joint_state,
     const std::vector<std::string>& joint_names,
@@ -463,7 +382,7 @@ bool leatherman::getJointPositions(
     return true;
 }
 
-void leatherman::findAndReplaceJointPosition(std::string name, double position, sensor_msgs::JointState &state)
+void findAndReplaceJointPosition(std::string name, double position, sensor_msgs::JointState &state)
 {
   bool exists = false;
   for(size_t i = 0; i < state.name.size(); i++)
@@ -481,7 +400,7 @@ void leatherman::findAndReplaceJointPosition(std::string name, double position, 
   }
 }
 
-bool leatherman::getJointIndex(const KDL::Chain &c, std::string name, int &index)
+bool getJointIndex(const KDL::Chain &c, std::string name, int &index)
 {
   for(size_t j = 0; j < c.getNrOfSegments(); ++j)
   {
@@ -494,7 +413,7 @@ bool leatherman::getJointIndex(const KDL::Chain &c, std::string name, int &index
   return false;
 }
 
-bool leatherman::getSegmentIndex(const KDL::Chain &c, std::string name, int &index)
+bool getSegmentIndex(const KDL::Chain &c, std::string name, int &index)
 {
   for(size_t j = 0; j < c.getNrOfSegments(); ++j)
   {
@@ -507,7 +426,7 @@ bool leatherman::getSegmentIndex(const KDL::Chain &c, std::string name, int &ind
   return false;
 }
 
-bool leatherman::getSegmentOfJoint(const KDL::Tree &tree, std::string joint, std::string &segment)
+bool getSegmentOfJoint(const KDL::Tree &tree, std::string joint, std::string &segment)
 {
   KDL::SegmentMap smap = tree.getSegments();
   for(std::map<std::string, KDL::TreeElement>::const_iterator iter = smap.begin(); iter != smap.end(); ++iter)
@@ -521,7 +440,7 @@ bool leatherman::getSegmentOfJoint(const KDL::Tree &tree, std::string joint, std
   return false;
 }
 
-bool leatherman::getChainTip(const KDL::Tree &tree, const std::vector<std::string> &segments, std::string chain_root, std::string &chain_tip)
+bool getChainTip(const KDL::Tree &tree, const std::vector<std::string> &segments, std::string chain_root, std::string &chain_tip)
 {
   KDL::Chain chain;
 
@@ -539,7 +458,7 @@ bool leatherman::getChainTip(const KDL::Tree &tree, const std::vector<std::strin
     size_t num_segments_included = 0;
     for(size_t j = 0; j < segments.size(); ++j)
     {
-      if(leatherman::getSegmentIndex(chain, segments[j], index))
+      if(getSegmentIndex(chain, segments[j], index))
         num_segments_included++;
     }
 
@@ -552,7 +471,7 @@ bool leatherman::getChainTip(const KDL::Tree &tree, const std::vector<std::strin
   return false;
 }
 
-void leatherman::HSVtoRGB(
+void HSVtoRGB(
     double* r, double* g, double* b,
     double h, double s, double v)
 {
@@ -603,26 +522,26 @@ void leatherman::HSVtoRGB(
     }
 }
 
-void leatherman::msgRGBToHSV(
+void msgRGBToHSV(
     const std_msgs::ColorRGBA& color,
     double& h, double& s, double& v)
 {
     // TODO: implement
 }
 
-void leatherman::msgHSVToRGB(
+void msgHSVToRGB(
     double h, double s, double v,
     std_msgs::ColorRGBA& color)
 {
     double r, g, b;
-    leatherman::HSVtoRGB(&r, &g, &b, h, s, v);
+    HSVtoRGB(&r, &g, &b, h, s, v);
     color.r = r;
     color.g = g;
     color.b = b;
     color.a = 1.0f;
 }
 
-void leatherman::setLoggerLevel(std::string package, std::string name, std::string level)
+void setLoggerLevel(std::string package, std::string name, std::string level)
 {
   ROSCONSOLE_AUTOINIT;
 
@@ -642,7 +561,7 @@ void leatherman::setLoggerLevel(std::string package, std::string name, std::stri
   ROS_DEBUG_NAMED(name, "This is a debug statement, and should print if you enabled debug.");
 }
 
-void leatherman::setLoggerLevel(std::string name, std::string level)
+void setLoggerLevel(std::string name, std::string level)
 {
   ROSCONSOLE_AUTOINIT;
 
@@ -662,168 +581,8 @@ void leatherman::setLoggerLevel(std::string name, std::string level)
   ROS_DEBUG_NAMED(name, "This is a debug statement, and should print if you enabled debug.");
 }
 
-bool leatherman::getPose(
-    const sensor_msgs::MultiDOFJointState& state,
-    std::string frame_id,
-    std::string child_frame_id,
-    geometry_msgs::Pose& pose)
-{
-    ROS_WARN("leatherman::getPose currently unimplemented");
-    return false;
-
-//  if(state.frame_ids.size() != state.child_frame_ids.size())
-//    return false;
-//
-//  if(frame_id.compare(child_frame_id) == 0)
-//  {
-//    pose.position.x = 0;
-//    pose.position.y = 0;
-//    pose.position.z = 0;
-//    pose.orientation.w = 1;
-//    return true;
-//  }
-//
-//  for(size_t i = 0; i < state.frame_ids.size(); ++i)
-//  {
-//    if(state.frame_ids[i].compare(frame_id) == 0)
-//    {
-//      if(state.child_frame_ids[i].compare(child_frame_id) == 0)
-//      {
-//        pose = state.poses[i];
-//        return true;
-//      }
-//    }
-//  }
-//
-//  // look for inverse
-//  for(size_t i = 0; i < state.frame_ids.size(); ++i)
-//  {
-//    if(state.child_frame_ids[i].compare(frame_id) == 0)
-//    {
-//      if(state.frame_ids[i].compare(child_frame_id) == 0)
-//      {
-//        tf::Transform bt;
-//        leatherman::poseMsgTobtTransform(state.poses[i], bt);
-//        leatherman::btTransformToPoseMsg(bt.inverse(), pose);
-//        return true;
-//      }
-//    }
-//  }
-//  return false;
-}
-
-bool leatherman::getJointLimits(
-    const urdf::Model* urdf,
-    const std::string& root_name,
-    const std::string& tip_name,
-    std::vector<std::string>& joint_names,
-    std::vector<double>& min_limits,
-    std::vector<double>& max_limits,
-    std::vector<bool>& continuous)
-{
-    // gather joints tracing backwards from the tip link to the root link;
-    // bail out if the root link is not encountered
-    unsigned int num_joints = 0;
-    boost::shared_ptr<const urdf::Link> link = urdf->getLink(tip_name);
-    while (link && link->name != root_name) {
-        boost::shared_ptr<const urdf::Joint> joint = urdf->getJoint(link->parent_joint->name);
-        ROS_DEBUG("adding joint: [%s]", joint->name.c_str() );
-        if (!joint) {
-            ROS_ERROR("Could not find joint: %s", link->parent_joint->name.c_str());
-            return false;
-        }
-        if (joint->type != urdf::Joint::UNKNOWN && joint->type != urdf::Joint::FIXED) {
-            num_joints++;
-        }
-        link = urdf->getLink(link->getParent()->name);
-    }
-    ROS_DEBUG("%d joints found.", num_joints);
-
-    min_limits.resize(num_joints);
-    max_limits.resize(num_joints);
-    joint_names.resize(num_joints);
-    continuous.resize(num_joints, false);
-
-    // gather limits for all joints between tip and link
-    link = urdf->getLink(tip_name);
-    unsigned int i = 0;
-    while (link && i < num_joints) {
-        boost::shared_ptr<const urdf::Joint> joint = urdf->getJoint(link->parent_joint->name);
-        ROS_DEBUG("getting bounds for joint: [%s]", joint->name.c_str() );
-        if (!joint) {
-            ROS_ERROR("Could not find joint: %s",link->parent_joint->name.c_str());
-            return false;
-        }
-        if (joint->type != urdf::Joint::UNKNOWN && joint->type != urdf::Joint::FIXED) {
-            if (joint->type != urdf::Joint::CONTINUOUS) {
-                joint_names[num_joints-i-1] = joint->name;
-                continuous[num_joints-i-1] = false;
-
-                if (joint->safety == NULL) {
-                    min_limits[num_joints-i-1] = joint->limits->lower;
-                    max_limits[num_joints-i-1] = joint->limits->upper;
-                }
-                else {
-                    min_limits[num_joints-i-1] = joint->safety->soft_lower_limit;
-                    max_limits[num_joints-i-1] = joint->safety->soft_upper_limit;
-                }
-            }
-            else {
-                joint_names[num_joints-i-1] = joint->name;
-                min_limits[num_joints-i-1] = -M_PI;
-                max_limits[num_joints-i-1] = M_PI;
-                continuous[num_joints-i-i] = true;
-            }
-            ROS_INFO("[%s] min: %0.3f  max: %0.3f", joint_names[num_joints-i-1].c_str(), min_limits[num_joints-i-1], max_limits[num_joints-i-1]);
-            i++;
-        }
-        link = urdf->getLink(link->getParent()->name);
-    }
-    return true;
-}
-
-bool leatherman::getJointLimits(
-    const urdf::Model* urdf,
-    const std::string& root_name,
-    const std::string& tip_name,
-    const std::string& joint_name,
-    double& min_limit,
-    double& max_limit,
-    bool& continuous)
-{
-    bool found_joint = false;
-    boost::shared_ptr<const urdf::Link> link = urdf->getLink(tip_name);
-    while (link && (link->name != root_name) && !found_joint)
-    {
-        boost::shared_ptr<const urdf::Joint> joint = urdf->getJoint(link->parent_joint->name);
-        if (joint->name.compare(joint_name) == 0) {
-            if (joint->type != urdf::Joint::UNKNOWN && joint->type != urdf::Joint::FIXED) {
-                if (joint->type != urdf::Joint::CONTINUOUS) {
-                    continuous = false;
-                    if (joint->safety == NULL) {
-                        min_limit = joint->limits->lower;
-                        max_limit = joint->limits->upper;
-                    }
-                    else {
-                        min_limit = joint->safety->soft_lower_limit;
-                        max_limit = joint->safety->soft_upper_limit;
-                    }
-                }
-                else {
-                    min_limit = -M_PI;
-                    max_limit = M_PI;
-                    continuous = true;
-                }
-            }
-            found_joint = true;
-        }
-        link = urdf->getLink(link->getParent()->name);
-    }
-    return found_joint;
-}
-
 /* Copied from Bullet Physics library */
-void leatherman::getRPY(const std::vector<std::vector<double> > &Rot, double* roll, double* pitch, double* yaw, int solution_number)
+void getRPY(const std::vector<std::vector<double> > &Rot, double* roll, double* pitch, double* yaw, int solution_number)
 {
   double delta,rpy1[3],rpy2[3];
 
@@ -883,7 +642,7 @@ void leatherman::getRPY(const std::vector<std::vector<double> > &Rot, double* ro
   }
 }
 
-bool leatherman::getMeshComponentsFromResource(
+bool getMeshComponentsFromResource(
     const std::string& resource,
     const Eigen::Vector3d& scale,
     std::vector<int>& triangles,
@@ -900,11 +659,11 @@ bool leatherman::getMeshComponentsFromResource(
     }
 
     shapes::Mesh* m = static_cast<shapes::Mesh*>(mesh);
-    leatherman::getMeshComponents(m, triangles, vertices);
+    getMeshComponents(m, triangles, vertices);
     return true;
 }
 
-void leatherman::scaleVertices(const std::vector<Eigen::Vector3d> &vin, double sx, double sy, double sz, std::vector<Eigen::Vector3d> &vout)
+void scaleVertices(const std::vector<Eigen::Vector3d> &vin, double sx, double sy, double sz, std::vector<Eigen::Vector3d> &vout)
 {
   // find the mean of the points
   Eigen::Vector3d mean;
@@ -934,7 +693,7 @@ void leatherman::scaleVertices(const std::vector<Eigen::Vector3d> &vin, double s
   }
 }
 
-void leatherman::scaleVertices(const std::vector<geometry_msgs::Point> &vin, double sx, double sy, double sz, std::vector<geometry_msgs::Point> &vout)
+void scaleVertices(const std::vector<geometry_msgs::Point> &vin, double sx, double sy, double sz, std::vector<geometry_msgs::Point> &vout)
 {
   std::vector<Eigen::Vector3d> evin(vin.size()), evout;
   for(size_t p = 0; p < vin.size(); ++p)
@@ -955,7 +714,7 @@ void leatherman::scaleVertices(const std::vector<geometry_msgs::Point> &vin, dou
   }
 }
 
-double leatherman::getColladaFileScale(std::string resource)
+double getColladaFileScale(std::string resource)
 {
   static std::map<std::string, float> rescale_cache;
 
@@ -1006,7 +765,7 @@ double leatherman::getColladaFileScale(std::string resource)
   return unit_scale;
 }
 
-bool leatherman::getLinkMesh(std::string urdf, std::string name, bool collision, std::string &mesh_resource, geometry_msgs::PoseStamped &pose)
+bool getLinkMesh(std::string urdf, std::string name, bool collision, std::string &mesh_resource, geometry_msgs::PoseStamped &pose)
 {
   urdf::Model model;
   if(!model.initString(urdf))
@@ -1061,3 +820,4 @@ bool leatherman::getLinkMesh(std::string urdf, std::string name, bool collision,
   return true;
 }
 
+} // namespace leatherman

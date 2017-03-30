@@ -30,10 +30,6 @@
 
 namespace leatherman {
 
-void rpyToQuatMsg(double r, double p, double y, geometry_msgs::Quaternion& q);
-
-void setRPY(double roll, double pitch, double yaw, Eigen::Matrix3d& m);
-void getRPY(const Eigen::Matrix3d& m, double& roll, double& pitch, double& yaw);
 void getRPY(
     const geometry_msgs::Quaternion& qmsg,
     double& roll, double& pitch, double& yaw);
@@ -41,26 +37,19 @@ void getRPY(
     const std::vector<std::vector<double> >& Rot,
     double* roll, double* pitch, double* yaw,
     int solution_number);
-tf::Quaternion setRPY(
-    const tfScalar& roll,
-    const tfScalar& pitch,
-    const tfScalar& yaw);
+
+////////////////////////
+// Geometry Utilities //
+////////////////////////
 
 double distanceBetween3DLineSegments(
     const Eigen::Vector3d& l1a, const Eigen::Vector3d& l1b,
     const Eigen::Vector3d& l2a, const Eigen::Vector3d& l2b);
-void getIntermediatePoints(
-    const Eigen::Vector3d& a,
-    const Eigen::Vector3d& b,
-    double d,
-    std::vector<Eigen::Vector3d>& points);
-bool getIntermediatePoints(
-    trajectory_msgs::JointTrajectoryPoint a,
-    trajectory_msgs::JointTrajectoryPoint b,
-    int num_points,
-    std::vector<trajectory_msgs::JointTrajectoryPoint>& points);
 
-/* Meshes */
+////////////////////
+// Mesh Utilities //
+////////////////////
+
 shapes::Mesh* createMeshFromBinaryStl(const char *filename);
 shapes::Mesh* createMeshFromBinaryStlData(const char *data, unsigned int size);
 void getMeshComponents(
@@ -88,8 +77,9 @@ bool getLinkMesh(
     std::string& mesh_resource,
     geometry_msgs::PoseStamped& pose);
 
-/* Search (string comparisons) */
-
+///////////////////////////
+// Joint State Utilities //
+///////////////////////////
 
 bool isValidJointState(const sensor_msgs::JointState& state);
 bool isValidMultiDOFJointState(const sensor_msgs::MultiDOFJointState& state);
@@ -120,11 +110,9 @@ void findAndReplaceJointPosition(
     double position,
     sensor_msgs::JointState& state);
 
-bool getPose(
-    const sensor_msgs::MultiDOFJointState& state,
-    std::string frame_id,
-    std::string child_frame_id,
-    geometry_msgs::Pose& pose);
+///////////////////
+// KDL Utilities //
+///////////////////
 
 bool getJointIndex(const KDL::Chain& c, std::string name, int& index);
 
@@ -140,24 +128,9 @@ bool getChainTip(
     const std::vector<std::string>& segments,
     std::string chain_root, std::string& chain_tip);
 
-/* Joint Limits */
-bool getJointLimits(
-    const urdf::Model* urdf,
-    const std::string& root_name,
-    const std::string& tip_name,
-    std::vector<std::string>& joint_names,
-    std::vector<double>& min_limits,
-    std::vector<double>& max_limits,
-    std::vector<bool>& continuous);
-
-bool getJointLimits(
-    const urdf::Model* urdf,
-    const std::string& root_name,
-    const std::string& tip_name,
-    const std::string& joint_name,
-    double& min_limit,
-    double& max_limit,
-    bool& continuous);
+////////////
+// Colors //
+////////////
 
 /// \brief Convert an (H, S, V) color triplet to (R, G, B) format.
 /// \param h The hue in range [0, 360)
@@ -167,7 +140,10 @@ void HSVtoRGB(double* r, double* g, double* b, double h, double s, double v);
 void msgRGBToHSV(const std_msgs::ColorRGBA& color, double& h, double& s, double& v);
 void msgHSVToRGB(double h, double s, double v, std_msgs::ColorRGBA& color);
 
-/* ROS Logging */
+/////////////////
+// ROS Logging //
+/////////////////
+
 void setLoggerLevel(std::string package, std::string name, std::string level);
 void setLoggerLevel(std::string name, std::string level);
 
