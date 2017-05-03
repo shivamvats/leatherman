@@ -140,6 +140,7 @@ bool getMeshComponentsFromResource(
 
     shapes::Mesh* m = static_cast<shapes::Mesh*>(mesh);
     getMeshComponents(m, triangles, vertices);
+    delete m;
     return true;
 }
 
