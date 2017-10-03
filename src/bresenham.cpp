@@ -1,10 +1,10 @@
 /*
  * Copyright (c) 2010, Maxim Likhachev
  * All rights reserved.
- * 
+ *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
- * 
+ *
  *     * Redistributions of source code must retain the above copyright
  *       notice, this list of conditions and the following disclaimer.
  *     * Redistributions in binary form must reproduce the above copyright
@@ -13,7 +13,7 @@
  *     * Neither the name of the University of Pennsylvania nor the names of its
  *       contributors may be used to endorse or promote products derived from
  *       this software without specific prior written permission.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -27,137 +27,125 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
- /** \author Maxim Likhachev */
-
 #include <leatherman/bresenham.h>
 
-void leatherman::get_bresenham3d_parameters(int p1x, int p1y, int p1z, int p2x, int p2y, int p2z, bresenham3d_param_t *params)
+#include <cmath>
+
+namespace leatherman {
+
+void InitBresenhamState(
+    BresenhamState3D& params,
+    int p1x, int p1y, int p1z,
+    int p2x, int p2y, int p2z)
 {
-  params->X1=p1x;
-  params->Y1=p1y;
-  params->Z1=p1z;
-  params->X2=p2x;
-  params->Y2=p2y;
-  params->Z2=p2z;
+    params.x1 = p1x;
+    params.y1 = p1y;
+    params.z1 = p1z;
+    params.x2 = p2x;
+    params.y2 = p2y;
+    params.z2 = p2z;
 
-  params->XIndex = params->X1; 
-  params->YIndex = params->Y1;
-  params->ZIndex = params->Z1;
+    params.index_x = params.x1;
+    params.index_y = params.y1;
+    params.index_z = params.z1;
 
-  params->dx = fabs((double)(p2x-p1x));
-  params->dy = fabs((double)(p2y-p1y));
-  params->dz = fabs((double)(p2z-p1z));
-  params->dx2 = params->dx << 1;
-  params->dy2 = params->dy << 1;
-  params->dz2 = params->dz << 1;
+    params.dx = std::abs(p2x - p1x);
+    params.dy = std::abs(p2y - p1y);
+    params.dz = std::abs(p2z - p1z);
+    params.dx2 = params.dx << 1;
+    params.dy2 = params.dy << 1;
+    params.dz2 = params.dz << 1;
 
-  //get direction of slope
-  if((double)(p2x-p1x) < 0)
-    params->IncX = -1;
-  else
-    params->IncX = 1;
+    // get direction of slope
+    if (p2x - p1x < 0) {
+        params.inc_x = -1;
+    } else {
+        params.inc_x = 1;
+    }
 
-  if((double)(p2y-p1y) < 0)
-    params->IncY = -1;
-  else
-    params->IncY = 1; 
+    if (p2y - p1y < 0) {
+        params.inc_y = -1;
+    } else {
+        params.inc_y = 1;
+    }
 
-  if((double)(p2z-p1z) < 0)
-    params->IncZ = -1;
-  else
-    params->IncZ = 1; 
+    if (p2z - p1z < 0) {
+        params.inc_z = -1;
+    } else {
+        params.inc_z = 1;
+    }
 
-  //choose which axis to use as the index
-  if(params->dx >= params->dy && params->dx >= params->dz)
-  {
-    params->UsingXYZIndex = 0;
-    params->err1 = params->dy2 - params->dx;
-    params->err2 = params->dz2 - params->dx;
-  }
-  else if(params->dy >= params->dx && params->dy >= params->dz)
-  {
-    params->UsingXYZIndex = 1;
-    params->err1 = params->dx2 - params->dy;
-    params->err2 = params->dz2 - params->dy;
-  }
-  else
-  {
-    params->UsingXYZIndex = 2; 
-    params->err1 = params->dy2 - params->dz;
-    params->err2 = params->dx2 - params->dz;
-  }
+    // choose which axis to use as the index
+    if (params.dx >= params.dy && params.dx >= params.dz) {
+        params.use_index = 0;
+        params.err1 = params.dy2 - params.dx;
+        params.err2 = params.dz2 - params.dx;
+    } else if (params.dy >= params.dx && params.dy >= params.dz) {
+        params.use_index = 1;
+        params.err1 = params.dx2 - params.dy;
+        params.err2 = params.dz2 - params.dy;
+    } else {
+        params.use_index = 2;
+        params.err1 = params.dy2 - params.dz;
+        params.err2 = params.dx2 - params.dz;
+    }
 }
 
-void leatherman::get_current_point3d(bresenham3d_param_t *params, int *x, int *y, int *z)
+void GetCurrentPoint(const BresenhamState3D& params, int* xyz)
 {
-  *x = params->XIndex;
-  *y = params->YIndex;
-  *z = params->ZIndex;
+    xyz[0] = params.index_x;
+    xyz[1] = params.index_y;
+    xyz[2] = params.index_z;
 }
 
-int leatherman::get_next_point3d(bresenham3d_param_t *params)
+bool AdvanceBresenham(BresenhamState3D& params)
 {
-  //check to see if at end of line
-  if (params->XIndex == params->X2 && params->YIndex == params->Y2 && params->ZIndex == params->Z2)
-    return 0;
+    // check to see if at end of line
+    if (params.index_x == params.x2 &&
+        params.index_y == params.y2 &&
+        params.index_z == params.z2)
+    {
+        return false;
+    }
 
-  if (params->UsingXYZIndex == 0)
-  {
-    if (params->err1 > 0) {
-      params->YIndex += params->IncY;
-      params->err1 -= params->dx2;
+    if (params.use_index == 0) {
+        if (params.err1 > 0) {
+            params.index_y += params.inc_y;
+            params.err1 -= params.dx2;
+        }
+        if (params.err2 > 0) {
+            params.index_z += params.inc_z;
+            params.err2 -= params.dx2;
+        }
+        params.err1 += params.dy2;
+        params.err2 += params.dz2;
+        params.index_x += params.inc_x;
+    } else if (params.use_index == 1) {
+        if (params.err1 > 0) {
+            params.index_x += params.inc_x;
+            params.err1 -= params.dy2;
+        }
+        if (params.err2 > 0) {
+            params.index_z += params.inc_z;
+            params.err2 -= params.dy2;
+        }
+        params.err1 += params.dx2;
+        params.err2 += params.dz2;
+        params.index_y += params.inc_y;
+    } else {
+        if (params.err1 > 0) {
+            params.index_y += params.inc_y;
+            params.err1 -= params.dz2;
+        }
+        if (params.err2 > 0) {
+            params.index_x += params.inc_x;
+            params.err2 -= params.dz2;
+        }
+        params.err1 += params.dy2;
+        params.err2 += params.dx2;
+        params.index_z += params.inc_z;
     }
-    if (params->err2 > 0) {
-      params->ZIndex += params->IncZ;
-      params->err2 -= params->dx2;
-    }
-    params->err1 += params->dy2;
-    params->err2 += params->dz2;
-    params->XIndex += params->IncX;
-  }
-  else if(params->UsingXYZIndex == 1)
-  {
-    if (params->err1 > 0) {
-      params->XIndex += params->IncX;
-      params->err1 -= params->dy2;
-    }
-    if (params->err2 > 0) {
-      params->ZIndex += params->IncZ;
-      params->err2 -= params->dy2;
-    }
-    params->err1 += params->dx2;
-    params->err2 += params->dz2;
-    params->YIndex += params->IncY;
-  }
-  else
-  {
-    if (params->err1 > 0) {
-      params->YIndex += params->IncY;
-      params->err1 -= params->dz2;
-    }
-    if (params->err2 > 0) {
-      params->XIndex += params->IncX;
-      params->err2 -= params->dz2;
-    }
-    params->err1 += params->dy2;
-    params->err2 += params->dx2;
-    params->ZIndex += params->IncZ;
-  }
-  return 1;
+    return true;
 }
 
-void leatherman::getLineSegment(const std::vector<int> a,const std::vector<int> b,std::vector<std::vector<int> > &points)
-{
-  leatherman::bresenham3d_param_t params;
-  std::vector<int> nXYZ(3,0);
-
-  //iterate through the points on the segment
-  leatherman::get_bresenham3d_parameters(a[0], a[1], a[2], b[0], b[1], b[2], &params);
-  do {
-    leatherman::get_current_point3d(&params, &(nXYZ[0]), &(nXYZ[1]), &(nXYZ[2]));
-
-    points.push_back(nXYZ);
-
-  } while (leatherman::get_next_point3d(&params));
-}
-
+} // namespace leatherman
