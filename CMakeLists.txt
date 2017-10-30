@@ -11,19 +11,19 @@ find_package(Bullet REQUIRED)
 find_package(
     catkin REQUIRED
     COMPONENTS
-        angles 
+        angles
         cmake_modules
-        geometric_shapes 
-        geometry_msgs 
+        geometric_shapes
+        geometry_msgs
         moveit_msgs
         octomap_ros
         octomap_msgs
-        roscpp 
-        sensor_msgs 
+        roscpp
+        sensor_msgs
         shape_msgs
-        tf 
+        tf
         trajectory_msgs
-        urdf 
+        urdf
         visualization_msgs)
 
 find_package(orocos_kdl REQUIRED)
@@ -37,26 +37,26 @@ catkin_package(
     INCLUDE_DIRS include
     LIBRARIES ${PROJECT_NAME}
     CATKIN_DEPENDS
-        angles 
-        geometric_shapes 
+        angles
+        geometric_shapes
         geometry_msgs
-        moveit_msgs 
+        moveit_msgs
         octomap_ros
-        octomap_msgs 
-        sensor_msgs 
+        octomap_msgs
+        sensor_msgs
         shape_msgs
-        tf 
+        tf
         trajectory_msgs
-        urdf 
+        urdf
         visualization_msgs
     DEPENDS Boost BULLET Eigen orocos_kdl)
 
-include_directories(${BULLET_INCLUDE_DIRS})
-include_directories(${Boost_INCLUDE_DIRS})
-include_directories(${Eigen_INCLUDE_DIRS})
-include_directories(${catkin_INCLUDE_DIRS})
-include_directories(${orocos_kdl_INCLUDE_DIRS})
-include_directories(${log4cxx_INCLUDE_DIRS})
+include_directories(SYSTEM ${BULLET_INCLUDE_DIRS})
+include_directories(SYSTEM ${Boost_INCLUDE_DIRS})
+include_directories(SYSTEM ${Eigen_INCLUDE_DIRS})
+include_directories(SYSTEM ${catkin_INCLUDE_DIRS})
+include_directories(SYSTEM ${orocos_kdl_INCLUDE_DIRS})
+include_directories(SYSTEM ${log4cxx_INCLUDE_DIRS})
 include_directories(include)
 
 add_library(
@@ -69,12 +69,12 @@ add_library(
     src/print.cpp
     src/profile.cpp
     src/stl.cpp
-    src/utils.cpp 
+    src/utils.cpp
     src/viz.cpp)
 target_link_libraries(
-    ${PROJECT_NAME} 
-    ${catkin_LIBRARIES} 
-    ${BULLET_LIBRARIES} 
+    ${PROJECT_NAME}
+    ${catkin_LIBRARIES}
+    ${BULLET_LIBRARIES}
     ${orocos_kdl_LIBRARIES}
     ${log4cxx_LIBRARIES})
 
