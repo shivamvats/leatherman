@@ -8,9 +8,9 @@
 #include <string>
 #include <vector>
 
-#include <angles/angles.h>
 #include <Eigen/Core>
 #include <Eigen/Geometry>
+#include <angles/angles.h>
 #include <geometric_shapes/mesh_operations.h>
 #include <geometry_msgs/Point.h>
 #include <geometry_msgs/Pose.h>

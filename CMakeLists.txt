@@ -6,8 +6,6 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
 
 find_package(Boost REQUIRED)
 
-find_package(Bullet REQUIRED)
-
 find_package(
     catkin REQUIRED
     COMPONENTS
@@ -18,13 +16,19 @@ find_package(
         moveit_msgs
         octomap_ros
         octomap_msgs
+        resource_retriever
         roscpp
         sensor_msgs
         shape_msgs
+        std_msgs
         tf
         trajectory_msgs
         urdf
         visualization_msgs)
+
+find_package(TinyXML REQUIRED)
+
+find_package(octomap REQUIRED)
 
 find_package(orocos_kdl REQUIRED)
 
@@ -34,8 +38,8 @@ find_package(PkgConfig REQUIRED)
 pkg_check_modules(log4cxx REQUIRED liblog4cxx)
 
 catkin_package(
-    INCLUDE_DIRS include
-    LIBRARIES ${PROJECT_NAME}
+    INCLUDE_DIRS include ${OCTOMAP_INCLUDE_DIRS}
+    LIBRARIES ${PROJECT_NAME} ${OCTOMAP_LIBRARIES}
     CATKIN_DEPENDS
         angles
         geometric_shapes
@@ -45,18 +49,23 @@ catkin_package(
         octomap_msgs
         sensor_msgs
         shape_msgs
+        std_msgs
         tf
         trajectory_msgs
         urdf
         visualization_msgs
-    DEPENDS Boost BULLET Eigen orocos_kdl)
+    DEPENDS
+        Boost
+        Eigen
+        orocos_kdl)
 
-include_directories(SYSTEM ${BULLET_INCLUDE_DIRS})
 include_directories(SYSTEM ${Boost_INCLUDE_DIRS})
+include_directories(SYSTEM ${OCTOMAP_INCLUDE_DIRS})
 include_directories(SYSTEM ${Eigen_INCLUDE_DIRS})
 include_directories(SYSTEM ${catkin_INCLUDE_DIRS})
 include_directories(SYSTEM ${orocos_kdl_INCLUDE_DIRS})
 include_directories(SYSTEM ${log4cxx_INCLUDE_DIRS})
+include_directories(SYSTEM ${TinyXML_INCLUDE_DIRS})
 include_directories(include)
 
 add_library(
@@ -74,7 +83,8 @@ add_library(
 target_link_libraries(
     ${PROJECT_NAME}
     ${catkin_LIBRARIES}
-    ${BULLET_LIBRARIES}
+    ${OCTOMAP_LIBRARIES}
+    ${TinyXML_LIBRARIES}
     ${orocos_kdl_LIBRARIES}
     ${log4cxx_LIBRARIES})
 
