@@ -5,6 +5,7 @@ set(CMAKE_BUILD_TYPE Release)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
 
 find_package(Boost REQUIRED)
+find_package(Eigen3 REQUIRED)
 
 find_package(
     catkin REQUIRED
@@ -32,13 +33,11 @@ find_package(octomap REQUIRED)
 
 find_package(orocos_kdl REQUIRED)
 
-find_package(Eigen REQUIRED) # dependent on finding cmake_modules through catkin
-
 find_package(PkgConfig REQUIRED)
 pkg_check_modules(log4cxx REQUIRED liblog4cxx)
 
 catkin_package(
-    INCLUDE_DIRS include ${OCTOMAP_INCLUDE_DIRS}
+    INCLUDE_DIRS include ${OCTOMAP_INCLUDE_DIRS} ${EIGEN3_INCLUDE_DIR}
     LIBRARIES ${PROJECT_NAME} ${OCTOMAP_LIBRARIES}
     CATKIN_DEPENDS
         angles
@@ -56,12 +55,11 @@ catkin_package(
         visualization_msgs
     DEPENDS
         Boost
-        Eigen
         orocos_kdl)
 
 include_directories(SYSTEM ${Boost_INCLUDE_DIRS})
 include_directories(SYSTEM ${OCTOMAP_INCLUDE_DIRS})
-include_directories(SYSTEM ${Eigen_INCLUDE_DIRS})
+include_directories(SYSTEM ${EIGEN3_INCLUDE_DIR})
 include_directories(SYSTEM ${catkin_INCLUDE_DIRS})
 include_directories(SYSTEM ${orocos_kdl_INCLUDE_DIRS})
 include_directories(SYSTEM ${log4cxx_INCLUDE_DIRS})
