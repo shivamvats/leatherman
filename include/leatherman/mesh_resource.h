@@ -30,8 +30,8 @@ bool getMeshComponentsFromResource(
 double getColladaFileScale(std::string resource);
 
 bool getLinkMesh(
-    std::string urdf,
-    std::string name,
+    const std::string &urdf,
+    const std::string &name,
     bool collision,
     std::string& mesh_resource,
     geometry_msgs::PoseStamped& pose);

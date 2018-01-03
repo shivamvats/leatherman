@@ -187,8 +187,8 @@ double getColladaFileScale(std::string resource)
 }
 
 bool getLinkMesh(
-    std::string urdf,
-    std::string name,
+    const std::string& urdf,
+    const std::string &name,
     bool collision,
     std::string &mesh_resource,
     geometry_msgs::PoseStamped &pose)
@@ -209,7 +209,7 @@ bool getLinkMesh(
         return false;
     }
     if (!link->collision->geometry) {
-        ROS_ERROR("Failed to find geometry for link '%s' in URDF. (group: %s)", name.c_str(), link->collision->group_name.c_str());
+        ROS_ERROR("Failed to find geometry for link '%s' in URDF.", name.c_str());
         return false;
     }
 
