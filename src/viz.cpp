@@ -494,8 +494,8 @@ visualization_msgs::MarkerArray getSpheresMarkerArray(
     const std::vector<std::vector<double> > &pose,
     std::vector<double> &radius,
     int hue,
-    std::string frame_id,
-    std::string ns,
+    const std::string &frame_id,
+    const std::string &ns,
     int id)
 {
     double r = 0, g = 0, b = 0;
