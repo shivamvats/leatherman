@@ -163,7 +163,7 @@ bool ReadBinvox(const char* filename, VoxelGrid& grid)
                 nr_voxels += count;
             }
             index = end_index;
-        }  
+        }
     }
 
     // final transaction
@@ -191,7 +191,7 @@ bool ReadBinvox(const std::string& filename, VoxelGrid& grid)
 }
 
 template <class Callable>
-bool IterateOccupiedVoxels(const VoxelGrid& grid, Callable proc)
+void IterateOccupiedVoxels(const VoxelGrid& grid, Callable proc)
 {
     int index = 0;
     for (int x = 0; x < grid.depth; ++x) {
@@ -291,7 +291,7 @@ bool convertBinvoxToVector3d(
         voxels.push_back(v);
     };
 
-    voxels.clear();    
+    voxels.clear();
     voxels.reserve(grid.occ_count);
     IterateOccupiedVoxels(grid, add_occ_voxel_to_voxels);
     return true;
