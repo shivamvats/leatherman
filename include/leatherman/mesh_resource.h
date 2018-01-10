@@ -14,14 +14,25 @@ namespace leatherman {
 
 void getMeshComponents(
     shapes::Mesh* mesh,
-    std::vector<int>& triangles,
+    std::vector<std::uint32_t>& triangles,
+    std::vector<Eigen::Vector3d>& vertices);
+
+void getMeshComponents(
+    shapes::Mesh* mesh,
+    std::vector<double>& vertex_data,
+    std::vector<std::uint32_t>& triangles);
+
+bool getMeshComponentsFromResource(
+    const std::string& resource,
+    const Eigen::Vector3d& scale,
+    std::vector<std::uint32_t>& triangles,
     std::vector<Eigen::Vector3d>& vertices);
 
 bool getMeshComponentsFromResource(
     const std::string& resource,
     const Eigen::Vector3d& scale,
-    std::vector<int>& triangles,
-    std::vector<Eigen::Vector3d>& vertices);
+    std::vector<double>& vertex_data,
+    std::vector<std::uint32_t>& triangles);
 
 double getColladaFileScale(std::string resource);
 

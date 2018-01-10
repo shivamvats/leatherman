@@ -1,5 +1,7 @@
 #include <leatherman/mesh_resource.h>
 
+#include <memory>
+
 // system includes
 #include <tinyxml.h>
 #include <geometric_shapes/mesh_operations.h>
@@ -11,7 +13,7 @@ namespace leatherman {
 
 void getMeshComponents(
     shapes::Mesh* mesh,
-    std::vector<int>& triangles,
+    std::vector<std::uint32_t>& triangles,
     std::vector<Eigen::Vector3d>& vertices)
 {
     Eigen::Vector3d v;
@@ -33,25 +35,63 @@ void getMeshComponents(
     }
 }
 
+void getMeshComponents(
+    shapes::Mesh* mesh,
+    std::vector<double>& vertex_data,
+    std::vector<std::uint32_t>& triangles)
+{
+    vertex_data.resize(3 * mesh->vertex_count);
+    std::copy(
+            mesh->vertices,
+            mesh->vertices + 3 * mesh->vertex_count,
+            begin(vertex_data));
+
+    triangles.resize(3 * mesh->triangle_count);
+    std::copy(
+            mesh->triangles,
+            mesh->triangles + 3 * mesh->triangle_count,
+            begin(triangles));
+}
+
 bool getMeshComponentsFromResource(
     const std::string& resource,
     const Eigen::Vector3d& scale,
-    std::vector<int>& triangles,
+    std::vector<std::uint32_t>& triangles,
     std::vector<Eigen::Vector3d>& vertices)
 {
     if (resource.empty()) {
         return false;
     }
 
-    shapes::Shape* mesh = shapes::createMeshFromResource(resource, scale);
+    std::unique_ptr<shapes::Mesh> mesh;
+    mesh.reset(shapes::createMeshFromResource(resource, scale));
     if (!mesh) {
         ROS_ERROR("Failed to load mesh '%s'", resource.c_str());
         return false;
     }
 
-    shapes::Mesh* m = static_cast<shapes::Mesh*>(mesh);
-    getMeshComponents(m, triangles, vertices);
-    delete m;
+    getMeshComponents(mesh.get(), triangles, vertices);
+    return true;
+}
+
+bool getMeshComponentsFromResource(
+    const std::string& resource,
+    const Eigen::Vector3d& scale,
+    std::vector<double>& vertex_data,
+    std::vector<std::uint32_t>& triangles)
+{
+    if (resource.empty()) {
+        return false;
+    }
+
+    std::unique_ptr<shapes::Mesh> mesh;
+    mesh.reset(shapes::createMeshFromResource(resource, scale));
+    if (!mesh) {
+        ROS_ERROR("Failed to load mesh '%s'", resource.c_str());
+        return false;
+    }
+
+    getMeshComponents(mesh.get(), vertex_data, triangles);
     return true;
 }
 
