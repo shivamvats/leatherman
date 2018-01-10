@@ -12,10 +12,6 @@
 
 namespace leatherman {
 
-shapes::Mesh* createMeshFromBinaryStl(const char *filename);
-
-shapes::Mesh* createMeshFromBinaryStlData(const char *data, unsigned int size);
-
 void getMeshComponents(
     shapes::Mesh* mesh,
     std::vector<int>& triangles,
