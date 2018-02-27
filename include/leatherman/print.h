@@ -7,6 +7,7 @@
 #include <cstring>
 #include <sstream>
 #include <string>
+#include <utility>
 #include <vector>
 
 // system includes
@@ -44,6 +45,13 @@ ostream& operator<<(ostream& o, const vector<T, Allocator>& v)
         }
     }
     o << " ]";
+    return o;
+}
+
+template <class T1, class T2>
+ostream& operator<<(ostream& o, const pair<T1, T2>& p)
+{
+    o << '(' << p.first << ", " << p.second << ')';
     return o;
 }
 
