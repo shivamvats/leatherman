@@ -3,30 +3,18 @@
 #ifndef _LEATHERMAN_UTILS_
 #define _LEATHERMAN_UTILS_
 
-#include <cstdlib>
-#include <iostream>
+// standard includes
 #include <string>
 #include <vector>
 
+// system includes
 #include <Eigen/Core>
 #include <Eigen/Geometry>
-#include <angles/angles.h>
-#include <geometric_shapes/mesh_operations.h>
-#include <geometry_msgs/Point.h>
-#include <geometry_msgs/Pose.h>
 #include <kdl/chain.hpp>
-#include <kdl/frames.hpp>
 #include <kdl/tree.hpp>
-#include <ros/console.h>
 #include <sensor_msgs/JointState.h>
 #include <sensor_msgs/MultiDOFJointState.h>
 #include <std_msgs/ColorRGBA.h>
-#include <tf/LinearMath/Scalar.h>
-#include <tf/LinearMath/Transform.h>
-#include <tf/LinearMath/Vector3.h>
-#include <tf/transform_datatypes.h>
-#include <trajectory_msgs/JointTrajectory.h>
-#include <urdf/model.h>
 
 namespace leatherman {
 

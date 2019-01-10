@@ -1,10 +1,13 @@
 #include <leatherman/utils.h>
-#include <leatherman/print.h>
-//#include <geometric_shapes/mesh_operations.h>
+
+// system includes
 #include <resource_retriever/retriever.h>
 #include <tinyxml.h>
-#include <urdf/model.h>
+#include <ros/console.h>
 #include <log4cxx/logger.h>
+
+// project includes
+#include <leatherman/print.h>
 
 #define SMALL_NUM  0.00000001     // to avoid division overflow
 

@@ -1,7 +1,10 @@
 /* \author Benjamin Cohen */
 
 #include <leatherman/viz.h>
+
+// system includes
 #include <tf/LinearMath/Quaternion.h>
+#include <tf/transform_datatypes.h>
 
 namespace viz {
 
