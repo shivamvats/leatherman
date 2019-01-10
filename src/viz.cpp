@@ -6,6 +6,9 @@
 #include <tf/LinearMath/Quaternion.h>
 #include <tf/transform_datatypes.h>
 
+// project includes
+#include <leatherman/utils.h>
+
 namespace viz {
 
 visualization_msgs::Marker getCubeMarker(

@@ -1,18 +1,21 @@
 /* \author Benjamin Cohen */
 
-#ifndef viz_viz_h
-#define viz_viz_h
+#ifndef LEATHERMAN_VIZ_H
+#define LEATHERMAN_VIZ_H
 
+// standard includes
 #include <string>
-#include <ros/console.h>
+
+// system includes
+#include <Eigen/Core>
+#include <Eigen/Geometry>
 #include <geometry_msgs/PoseStamped.h>
 #include <geometry_msgs/Vector3.h>
-#include <visualization_msgs/MarkerArray.h>
-#include <visualization_msgs/Marker.h>
-#include <boost/lexical_cast.hpp>
-#include <leatherman/utils.h>
 #include <moveit_msgs/CollisionObject.h>
+#include <ros/console.h>
 #include <shape_msgs/SolidPrimitive.h>
+#include <visualization_msgs/Marker.h>
+#include <visualization_msgs/MarkerArray.h>
 
 namespace viz {
 

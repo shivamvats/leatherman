@@ -1,10 +1,10 @@
 #include <leatherman/utils.h>
 
 // system includes
-#include <resource_retriever/retriever.h>
-#include <tinyxml.h>
-#include <ros/console.h>
 #include <log4cxx/logger.h>
+#include <resource_retriever/retriever.h>
+#include <ros/console.h>
+#include <tinyxml.h>
 
 // project includes
 #include <leatherman/print.h>
