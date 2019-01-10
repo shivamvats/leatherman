@@ -1,14 +1,14 @@
 #ifndef _LEATHERMAN_FILE_
 #define _LEATHERMAN_FILE_
 
+// standard includes
+#include <string>
+#include <vector>
+
+// system includes
 #include <Eigen/Core>
 #include <Eigen/Geometry>
-#include <dirent.h>
-#include <ros/console.h>
-#include <ros/package.h>
-#include <sys/stat.h>
 #include <trajectory_msgs/JointTrajectory.h>
-#include <unistd.h>
 
 namespace leatherman
 {

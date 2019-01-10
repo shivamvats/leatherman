@@ -1,5 +1,14 @@
 #include <leatherman/file.h>
+
+// standard includes
 #include <algorithm>
+
+// system includes
+#include <dirent.h>
+#include <ros/console.h>
+#include <ros/package.h>
+#include <sys/stat.h>
+#include <unistd.h>
 
 bool compare(std::string a, std::string b)
 {
@@ -31,9 +40,9 @@ bool leatherman::writeJointTrajectoryToFile(FILE** file, const trajectory_msgs::
     ROS_ERROR("File pointer is null. Not writing.");
     return false;
   }
-  
+
   for(size_t i = 0; i < traj.points.size(); ++i)
-  { 
+  {
     fprintf(*file, "%d, time_from_start, %1.4f, ", int(i), traj.points[i].time_from_start.toSec());
     // positions
     if(traj.points[i].positions.size() > 0)
@@ -44,21 +53,21 @@ bool leatherman::writeJointTrajectoryToFile(FILE** file, const trajectory_msgs::
     }
     // velocities
     if(traj.points[i].velocities.size() > 0)
-    { 
+    {
       fprintf(*file, "velocities, ");
       for(size_t j = 0; j < traj.points[i].velocities.size(); ++j)
         fprintf(*file, "%1.4f, ", traj.points[i].velocities[j]);
     }
     // accelerations
     if(traj.points[i].accelerations.size() > 0)
-    { 
+    {
       fprintf(*file, "accelerations, ");
       for(size_t j = 0; j < traj.points[i].accelerations.size(); ++j)
         fprintf(*file, "%1.4f, ", traj.points[i].accelerations[j]);
     }
     fprintf(*file, "\n");
-  }   
-      
+  }
+
   fflush(*file);
   return true;
 }
@@ -75,7 +84,7 @@ bool leatherman::getFolderContents(std::string folder_name, std::vector<std::str
 
   while ((dirp = readdir(dp)) != NULL)
   {
-    if((std::string(dirp->d_name).compare(".") != 0) && 
+    if((std::string(dirp->d_name).compare(".") != 0) &&
        (std::string(dirp->d_name).compare("..") != 0))
     files.push_back(std::string(dirp->d_name));
   }
@@ -102,10 +111,10 @@ bool leatherman::writePointsToFile(std::string filename, const std::vector<Eigen
     ROS_ERROR("Failed to open file for writing. {%s}", filename.c_str());
     return false;
   }
-  
+
   for(size_t i = 0; i < pts.size(); ++i)
     fprintf(f, "%1.4f, %1.4f, %1.4f\n", pts[i].x(), pts[i].y(), pts[i].z());
-   
+
   fflush(f);
   fclose(f);
   return true;
@@ -119,7 +128,7 @@ bool leatherman::readPointsInFile(std::string filename, std::vector<Eigen::Vecto
     ROS_ERROR("Failed to open file for writing. {%s}", filename.c_str());
     return false;
   }
- 
+
   Eigen::Vector3d v;
   float x,y,z;
   while(!feof(f))
@@ -181,13 +190,13 @@ std::string leatherman::getExtension(std::string filename)
 }
 
 std::string leatherman::replaceExtension(std::string filename, std::string extension)
-{ 
+{
   std::string output="";
   std::size_t pos = filename.find_last_of(".");
 
   if (pos != std::string::npos)
     output = filename.replace(filename.begin()+pos+1, filename.end(), extension);
-  
+
   return output;
 }
 
@@ -195,7 +204,7 @@ bool leatherman::getSystemPathFromROSPath(std::string ros_path, std::string &sys
 {
   std::string rp = ros_path;
   std::string pn, apn;
-  
+
   // remove 'package://'
   size_t pos = rp.find_first_of("package://");
   if(pos != std::string::npos)
@@ -204,29 +213,29 @@ bool leatherman::getSystemPathFromROSPath(std::string ros_path, std::string &sys
   {
     ROS_ERROR("Not a ROS package path. (Failed to find 'package://')");
     return false;
-  } 
-  
+  }
+
   // get package name
   pos = rp.find_first_of("/");
   if(pos != std::string::npos)
-  { 
+  {
     pn.assign(rp.begin(), rp.begin() + pos);
     apn.assign(rp.begin() + pos + 1, rp.end());
   }
   else
-  { 
+  {
     ROS_ERROR("No slash found when searching for package name.");
     return false;
   }
-  
+
   // get package path
   std::string package_path = ros::package::getPath(pn);
   if(package_path.empty())
-  { 
+  {
     ROS_ERROR("Failed to get system path for package '%s'", pn.c_str());
     return false;
   }
-  
+
   system_path = package_path + "/" + apn;
   return true;
 }
