@@ -19,6 +19,7 @@ find_package(
         octomap_msgs
         resource_retriever
         roscpp
+        roslib
         sensor_msgs
         shape_msgs
         std_msgs
